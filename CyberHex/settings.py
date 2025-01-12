@@ -164,4 +164,4 @@ LOGIN_REDIRECT_URL = "/"
 
 LOGOUT_REDIRECT_URL = "/"
 
-ALLOWED_HOSTS = ['bokupedia.pythonanywhere.com']
+ALLOWED_HOSTS = ['Bokupedia.pythonanywhere.com']
