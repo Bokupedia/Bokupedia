@@ -1,0 +1,519 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block content %}
+<main class="forum-container">
+  <section class="users-sidebar">
+    <div class="users-container">
+        <h3>Tüm Bokupedialılar</h3>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Kullanıcı ara..." onkeyup="searchUsers()">
+        </div>
+        <div class="users-list">
+            {% for user_item in users %}
+                <div class="user-item" data-username="{{ user_item.username|lower }}">
+                    <a href="/accounts/profile/{{ user_item.username }}/" class="username">{{ user_item.username }}</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+  </section>
+
+  <section class="latest-posts">
+    {% if user.is_authenticated %}
+    <div class="header-section">
+      <h2>Son Gönderiler</h2>
+      <button class="new-post-btn" onclick="openPostModal()">Yeni Gönderi</button>
+    </div>
+    <ul>
+      {% for post in latest_posts %}
+      <li>
+        <p>
+          <strong>{{ post.author.username }}</strong> tarafından
+          <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}">
+            {{ post.topic.category.name }} {{ post.topic.title }} <b><i><span style="color:#e50202;">Daha fazlası için tıkla...</span></i></b>
+          </a>
+        </p>
+        <div>
+          {{ post.content|striptags|escape|truncatewords:7 }}
+        </div>
+        <p><small>{{ post.created_at|date:"d M Y H:i" }}</small></p>
+      </li>
+      {% empty %}
+      <li>Herhangi bir gönderi yok.</li>
+      {% endfor %}
+    </ul>
+
+    <!-- Post Modal -->
+    <div id="postModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closePostModal()">&times;</span>
+        <h3>Yeni Gönderi Oluştur</h3>
+        <form method="POST" action="{% url 'discussion_forum:create_post' %}" class="post-form" enctype="multipart/form-data" onsubmit="return validatePostForm()">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="category">Kategori:</label>
+            <select name="category" id="category" required>
+              <option value="">Kategori Seçin</option>
+              {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="topic">Başlık:</label>
+            <select name="topic" id="topic">
+              <option value="">Başlık Seçin (Varsa 😉)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="content">İçerik:</label>
+            <textarea name="content" id="content" required></textarea>
+          </div>
+          
+          <!-- Add media upload section -->
+          <div class="media-upload">
+            <input type="file" name="media" id="post-media-upload" accept="image/*" style="display: none;">
+            <label for="post-media-upload" class="media-upload-btn">
+              <i class="fas fa-image"></i> Resim/Gif Ekle
+            </label>
+            <div id="post-media-preview"></div>
+          </div>
+          
+          <button type="submit" class="submit-btn">Gönder</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if latest_posts.has_other_pages %}
+        <div class="pagination">
+            {% if latest_posts.has_previous %}
+                <a href="?page={{ latest_posts.previous_page_number }}" class="page-link">&laquo; Önceki</a>
+            {% endif %}
+
+            {% for num in latest_posts.paginator.page_range %}
+                {% if latest_posts.number == num %}
+                    <span class="current-page">{{ num }}</span>
+                {% else %}
+                    <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if latest_posts.has_next %}
+                <a href="?page={{ latest_posts.next_page_number }}" class="page-link">Sonraki &raquo;</a>
+            {% endif %}
+        </div>
+    {% endif %}
+  </section>
+
+    {% else %}
+    <main class="auth-container">
+      <section class="auth">
+          <h2>Anasayfayı Görmek İçin Giriş Yapın!</h2>
+      </section>
+    </main>
+    {% endif %}
+</main>
+
+<style>
+  .forum-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 1em;
+  }
+
+  .users-sidebar {
+    background-color: #121212;
+    padding: 20px;
+    border-radius: 8px;
+    height: max-content;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .latest-posts {
+    width: 700px;
+    max-width: 1200px;
+    padding: 20px;
+    background-color: #121212;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
+  }
+
+  .users-container {
+    background-color: #121212;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
+  }
+
+  .users-container h3 {
+    color: #cab7b7;
+    border-bottom: 2px solid #5e0000;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+  }
+
+  .search-container {
+    margin-bottom: 15px;
+  }
+
+  .search-container input {
+    width: max-content;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #2d2d2d;
+    border: 1px solid #3d3d3d;
+    color: #fff;
+  }
+
+  .users-list {
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  .user-item {
+    background-color: rgb(27, 27, 27);
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 8px;
+    transition: background-color 0.3s;
+  }
+
+  .user-item:hover {
+    background-color: #2d2d2d;
+  }
+
+  .username {
+    color: #b1b1b1;
+    font-size: 14px;
+  }
+
+  .users-list::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .users-list::-webkit-scrollbar-track {
+    background: #1b1b1b;
+    border-radius: 4px;
+  }
+
+  .users-list::-webkit-scrollbar-thumb {
+    background: #5e0000;
+    border-radius: 4px;
+  }
+
+  .users-list::-webkit-scrollbar-thumb:hover {
+    background: #7a0000;
+  }
+
+  @media (max-width: 768px) {
+    .forum-container {
+      grid-template-columns: 1fr;
+    }
+
+    .users-sidebar {
+      position: static;
+    }
+  }
+
+  .latest-posts h2 {
+    color: #cab7b7;
+    border-bottom: 2px solid #5e0000;
+    padding-bottom: 10px;
+  }
+
+  .latest-posts ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .latest-posts li {
+    background-color: rgb(27, 27, 27);
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .latest-posts a {
+    color: #b1b1b1;
+    text-decoration: none;
+  }
+
+  .latest-posts small {
+    color: #6c757d;
+  }
+
+  .pagination {
+    margin: 20px 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .pagination a, .pagination span {
+    color: #c0c0c0;
+    padding: 8px 16px;
+    text-decoration: none;
+    border: 1px solid #2d2d2d;
+    border-radius: 4px;
+    background-color: #1d1d1d;
+    transition: background-color 0.3s ease;
+  }
+
+  .pagination a:hover {
+    background-color: #2d2d2d;
+    color: #c70101;
+  }
+
+  .pagination .current-page {
+    background-color: #5e0000;
+    color: white;
+    border-color: #5e0000;
+  }
+
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .new-post-btn {
+    background-color: #5e0000;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .new-post-btn:hover {
+    background-color: #7a0000;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+  }
+
+  .modal-content {
+    background-color: #1b1b1b;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .close:hover {
+    color: #fff;
+  }
+
+  .post-form .form-group {
+    margin-bottom: 15px;
+  }
+
+  .post-form label {
+    display: block;
+    margin-bottom: 5px;
+    color: #cab7b7;
+  }
+
+  .post-form select,
+  .post-form textarea {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #2d2d2d;
+    border: 1px solid #3d3d3d;
+    color: #fff;
+  }
+
+  .post-form .submit-btn {
+    background-color: #5e0000;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .post-form .submit-btn:hover {
+    background-color: #7a0000;
+  }
+
+      /* Media Upload Styles */
+    .media-upload {
+        margin-bottom: 15px;
+    }
+
+    .media-upload-btn {
+        padding: 8px 15px;
+        background-color: #444;
+        color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .media-upload-btn:hover {
+        background-color: #555;
+        transform: scale(1.05);
+    }
+
+    .file-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #333;
+        padding: 6px 12px;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+
+    .file-name {
+        color: #fff;
+        font-size: 14px;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .remove-file {
+        background: none;
+        border: none;
+        color: #ff4444;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 0 4px;
+    }
+
+    .remove-file:hover {
+        color: #ff0000;
+    }
+</style>
+
+<script>
+  function openPostModal() {
+    document.getElementById('postModal').style.display = 'block';
+  }
+
+  function closePostModal() {
+    document.getElementById('postModal').style.display = 'none';
+  }
+
+  document.getElementById('category').addEventListener('change', function() {
+    const categoryId = this.value;
+    const topicSelect = document.getElementById('topic');
+    
+    fetch(`/api/topics/${categoryId}/`)
+      .then(response => response.json())
+      .then(data => {
+        topicSelect.innerHTML = '<option value="">Konu Seçin (Opsiyonel (Varsa 😉))</option>';
+        data.topics.forEach(topic => {
+          topicSelect.innerHTML += `<option value="${topic.id}">${topic.title}</option>`;
+        });
+      });
+  });
+
+  window.onclick = function(event) {
+    const modal = document.getElementById('postModal');
+    if (event.target == modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  function searchUsers() {
+    const input = document.getElementById('searchInput');
+    if (!input) return;
+
+    const filter = input.value.toLowerCase();
+    const users = document.querySelectorAll('.user-item');
+
+    users.forEach(user => {
+      const username = user.getAttribute('data-username');
+      if (username.indexOf(filter) > -1) {
+        user.style.display = '';
+      } else {
+        user.style.display = 'none';
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('post-media-upload');
+    const previewDiv = document.getElementById('post-media-preview');
+    
+    fileInput.addEventListener('change', function(e) {
+        const file = this.files[0];
+        if (!file) return;
+        
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Dosya boyutu 5MB\'dan küçük olmalıdır');
+            this.value = '';  
+            previewDiv.innerHTML = '';  
+            return;
+        }
+        
+        previewDiv.innerHTML = `
+            <div class="file-info">
+                <i class="fas fa-image"></i>
+                <span class="file-name">${file.name}</span>
+                <button type="button" class="remove-file">×</button>
+            </div>`;
+        
+        const removeButton = previewDiv.querySelector('.remove-file');
+        removeButton.addEventListener('click', function() {
+            fileInput.value = '';
+            previewDiv.innerHTML = '';
+        });
+    });
+});
+
+function validatePostForm() {
+    const content = document.getElementById("content").value.trim();
+    const mediaUpload = document.getElementById("post-media-upload").files.length;
+    const category = document.getElementById("category").value;
+
+    if (!category) {
+        alert("Lütfen bir kategori seçin!");
+        return false;
+    }
+
+    if (!content && mediaUpload === 0) {
+        alert("İçerik yazmalı veya medya yüklemelisiniz!");
+        return false;
+    }
+
+    return true;
+}
+</script>
+
+{% endblock %}

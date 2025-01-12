@@ -1,0 +1,230 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block content %}
+{% if user.is_authenticated %}
+<main class="staff-container">
+   <style>
+      .staff-container {
+         display: flex;
+         justify-content: center;
+         padding: 3em 0;
+      }
+      
+      .staff-card {
+         background-color: rgba(0, 0, 0, 0.6);  /* sondaki opaklık değeri */
+         color: #fff;
+         padding: 2.5em;
+         border-radius: 10px;
+         width: 50%;
+         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+         text-align: left;
+         transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      }
+      
+      .staff-card:hover {
+         -webkit-transform: translateY(-5px);
+         -ms-transform: translateY(-5px);
+         transform: translateY(-5px);
+         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+      }
+      
+      .staff-info {
+         margin-bottom: 2em;
+      }
+      
+      .staff-card img {
+         border-radius: 50%;
+         width: 120px;
+         height: 120px;
+         object-fit: cover;
+         margin-bottom: 1.5em;
+         border: 3px solid #444;
+         display: block;
+         margin-left: auto;
+         margin-right: auto;
+      }
+      
+      .staff-card table {
+         width: 100%;
+         border-collapse: collapse;
+         margin-bottom: 2em;
+      }
+      
+      .staff-card table td {
+         padding: 12px;
+         border-bottom: 1px solid #444;
+      }
+      
+      .staff-card table td:first-child {
+         width: 35%;
+         font-weight: bold;
+         color: #ccc;
+      }
+      
+      .staff-card table td:nth-child(2) {
+         font-size: 1.1em;
+         color: #ddd;
+      }
+      
+      .staff-card table tr:last-child td {
+         border-bottom: none;
+      }
+      
+      .staff-menu {
+         margin-top: 2em;
+         border-top: 1px solid #444;
+         padding-top: 1.5em;
+      }
+      
+      .staff-menu ul {
+         list-style: none;
+         padding: 0;
+         margin: 0;
+         display: grid;
+         grid-template-columns: repeat(2, 1fr);
+         gap: 1em;
+      }
+      
+      .staff-menu li {
+         margin: 0;
+      }
+      
+      .staff-menu a {
+         display: block;
+         text-decoration: none;
+         color: #e0e0e0;
+         padding: 1em;
+         background-color: #383838;
+         border-radius: 5px;
+         transition: all 0.3s ease;
+         text-align: center;
+      }
+      
+      .staff-menu a:hover {
+         background-color: hwb(0 0% 30%);
+         color: #fff;
+         transform: translateY(-2px);
+      }
+   </style>
+   <div class="staff-card">
+      <img src="{% static 'images/staff/yigit.jpg' %}" alt="Profile Picture" />
+      <h2>Yiğit Anıl Tırpancı</h2>
+      <p>- Band of 35 Kurucu/Müdür - Band of 35 Yönetim Kurulu - Grand RP Peygamberi</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/ilayda.jpg' %}" alt="Profile Picture" />
+      <h2>İlayda Tombaz</h2>
+      <p>- Müdür Yardımcısı - Band of 35 Yönetim Kurulu - Grand RP Peygamberi</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/umut.jpeg' %}" alt="Profile Picture" />
+      <h2>Umut Tapar</h2>
+      <p>- Kontent Kontrol - 2023-24 Band of 35 Karar Mercii - Band of 35 Yönetim Kurulu - Terörist - Eski LoL, Valo, CS, COD, NBA Peygamberliği - Diyetisyen Katili (5 tane harcadı) - Trendyol Yemek CEO (ek iş) - BGY Band of Şube Sorumlusu - Tiktok Uzmanı - Emekli Assubay - General - Filozof - Part Time Kaleci - Amele - Marangoz - Emek Hırsızı - IT - Kral (uyuyor) - (<i><a span style="color:rgb(173, 176, 253)" href="https://www.instagram.com/rashidsanjer001/"></i>@rashidsanjer001</a>)
+      </p>
+      <hr><br><br>
+      
+      <img src="{% static 'images/staff/doğukan.jpeg' %}" alt="Profile Picture" />
+      <h2>Doğukan Taşkıran</h2>
+      <p>- Editör - Yazılım&Kodlama - Band of 35 Yönetim Kurulu - Mordor Yönetim Kurulu - Rocket League Peygamberliği - Osu Şehzadesi - Kontent Creator - Müzisyen/Yazar (Söz&Müzik) - ARAM God - Arena God</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/ömer.jpeg' %}" alt="Profile Picture" />
+      <h2>Ömer Yusuf Yaman</h2>
+      <p>- Editör - Text ve Kurgu - Sosyal Medya Sorumlusu - Band of 35 Yönetim Kurulu - Kontent Creator - Müzisyen/Yazar (Söz&Müzik)</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/emre.jpeg' %}" alt="Profile Picture" />
+      <h2>Emre Pakır</h2>
+      <p>- Osu Peygamberliği - Band of 35 Yönetim Kurulu - Nazi Sempatizanı - Osu Dünya #5939. (3.12.2024)</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/tuna.jpg' %}" alt="Profile Picture" />
+      <h2>Tuna Enes Gökkaya</h2>
+      <p>- Mordor Kurucu - Rocket League Peygamberi - Band of 35 Yönetim Kurulu</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/serife.jpg' %}" alt="Profile Picture" />
+      <h2>Şerife Cömert (Gökkaya⌛)</h2>
+      <p>- Band of 35 Yönetim Kurulu - Mordor Yönetim Kurulu</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/taner.jpg' %}" alt="Profile Picture" />
+      <h2>Taner Yalçın</h2> 
+      <p>- Dış İşler Müdürü - Band of 35 Hollanda Büyük Elçisi</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/bartu.jpg' %}" alt="Profile Picture" />
+      <h2>Bartu Kaçmaz</h2>
+      <p>- League of Legends Orta Doğu Peygamberi</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/oguz.jpg' %}" alt="Profile Picture" />
+      <h2>Oğuz Genç</h2>
+      <p>- Eski FIFA Peygamberi - Güncel Marvel Rivals Peygamberi - Emekli (ölü) Rocket League Peygamberi - NBA Peygamberi - Kadim İlah Malphite -Tiktok Uzmanı</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/berkay.jpeg' %}" alt="Profile Picture" />
+      <h2>Berkay Kırtıl</h2>
+      <p>- Güncel FIFA Peygamberi - Orta Doğu ve Balkanlar Marvel Rivals Peygamberi - Band of Galatasaray Şube Müdürü/Tribün Lideri</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/ghy.jpeg' %}" alt="Profile Picture" />
+      <h2>Gürkan Harun Yaman</h2>
+      <p>- Fizyoterapist (<i><a span style="color:rgb(173, 176, 253)" href="https://www.instagram.com/gurkanyaman.fzt/"></i>@gurkanyaman.fzt</a>) - Aşk Doktoru - Kainatın Aptalı</p>
+      <hr><br><br>
+      
+      <img src="{% static 'images/staff/can.jpg' %}" alt="Profile Picture" />
+      <h2>Vehbi Can Ispartalıoğlu</h2>
+      <p>- Skolyoz - Mühendis Istatistiği Akademik Eğitim Personeli (4 senedir)</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/ac.jpg' %}" alt="Profile Picture" />
+      <h2>Arda Çalışkan</h2>
+      <p>- Okeye 4. lazım denince hemen gelen adam</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/baris.png' %}" alt="Profile Picture" />
+      <h2>Barış Hayin</h2>
+      <p>- Mid Lane Uzmanı - Valorant Peygamberliği</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/kadir.png' %}" alt="Profile Picture" />
+      <h2>Kadir Yitik</h2>
+      <p>- League of Legends Tanrılığı(west/tr)</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/venco.jpeg' %}" alt="Profile Picture" />
+      <h2>Furkan Doğaç (Vvenco)</h2>
+      <p>- Counter Strike Peygamberliği - Personal Trainer (<i><a span style="color:rgb(173, 176, 253)" href="https://www.instagram.com/fitcoachfurkan/"></i>@fitcoachfurkan</a>)
+      </p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/canblack.jpg' %}" alt="Profile Picture" />
+      <h2>Can Black</h2>
+      <p>- Umut Tapar'ın Oğlu - Müdür Veliahtı/Şehzade - Grand RP Peygamberi</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/arda.jpg' %}" alt="Profile Picture" />
+      <h2>Arda Koçyiğit</h2>
+      <p>- Grand RP Peygamberi</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/hain.jpg' %}" alt="Profile Picture" />
+      <h2>Fatih Erdoğan</h2>
+      <p>- Pedofili - Hain, Anmıyoruz</p>
+      <hr><br><br>
+
+      <img src="{% static 'images/staff/hain.jpg' %}" alt="Profile Picture" />
+      <h2>I Miss Him</h2>
+      <p>- Hain, Anmıyoruz</p>
+      <hr><br><br>
+   </div>
+</main>
+{% else %}
+<main class="auth-container">
+    <section class="auth">
+      <h2>Akademik Kadroyu Görmek İçin Giriş Yapın!</h2>
+    </section>
+</main>
+{% endif %}
+{% endblock %}

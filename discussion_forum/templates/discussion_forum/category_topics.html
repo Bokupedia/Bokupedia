@@ -1,0 +1,113 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block content %}
+    <section class="category-detail-posts">
+        <h2>{{ category.name }}</h2>
+    
+      {% if not category.description|striptags|cut:" "|cut:"&nbsp;"|cut:"-" %}
+      {% else %}
+          <div>
+            <h3>{{ category.description|safe }}</h>
+          </div>  
+          <br>   
+      {% endif %}
+
+      {% if topics or direct_posts %}
+            {% for topic in topics %}
+            <ul>
+              <summary>
+                  <a href="{% url 'discussion_forum:topic_detail' topic.title %}">{{ topic.title }}</a>
+              </summary>
+            </ul>
+            {% endfor %}
+
+            {% for post in direct_posts %}
+            <ol>
+              <summary>
+                  <p>
+                    <strong>{{ post.author.username }}</strong> tarafından
+                    <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}">
+                      {{ post.topic.category.name }} {{ post.topic.title }} <b><i><span style="color:#e50202;">Daha fazlası için tıkla...</span></i></b>
+                    </a>
+                  </p>
+                    <div>
+                      {{  post.content|striptags|escape|truncatewords:7  }}
+                    </div>
+                  <p><small>{{ post.created_at|date:"d M Y H:i" }}</small></p>
+              </summary>
+            </ol>
+            {% endfor %}
+      {% else %}
+        <div class="category-no-post">
+          <p>Bu kategoride henüz içerik bulunmuyor.</p>
+        </div>
+      {% endif %}
+    </section>
+    <style>
+
+      summary {
+        font-size: 1.3em;
+        cursor: pointer;
+        background-color: #313131;
+        color: gra;
+        padding: 10px;
+        border-radius: 4px;
+        user-select: none;
+      }
+      
+      summary:hover {
+        background-color: #1d1d1d;
+      }
+      
+      .category-detail-posts {
+        max-width: 1200px;
+        width: 100%;
+        margin: 30px auto 60px auto;
+        padding: 20px;
+        background-color: #121212;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
+      }
+      
+      .category-detail-posts h2 {
+        color: #cab7b7;
+        border-bottom: 2px solid #5e0000;
+        padding-bottom: 10px;
+      }
+      
+      .category-detail-posts h3 {
+        color: #cab7b7;
+        border-bottom: 2px solid #5e0000;
+        padding-bottom: 10px;
+      }
+      
+      .category-detail-posts ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      
+      .category-detail-posts li {
+        background-color: rgb(27, 27, 27);
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+      
+      .category-detail-posts a {
+        color: #b1b1b1;
+        text-decoration: none;
+      }
+      
+      .category-detail-posts small {
+        color: #6c757d;
+      }
+
+      .category-no-post {
+        color: #888;
+        font-style: italic;
+        text-align: center;
+        padding: 1em 0;
+      }
+    </style>
+{% endblock %}

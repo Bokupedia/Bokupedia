@@ -1,0 +1,156 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+<section class="profile-container">
+    <div class="profile-card">
+        <div class="profile-info">
+            <table>
+                <tr>
+                    <td><strong>Kullanıcı adı</strong></td>
+                    <td>{{ user }}</td>
+                </tr>
+                <tr>
+                    <td><strong>İsim</strong></td>
+                    <td>{{ user.first_name|default:"Henüz belirtilmemiş" }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Biyografi</strong></td>
+                    <td class="bio-text">{{ profile.bio|default:"Henüz belirtilmemiş" }}</td>
+                </tr>
+            </table>
+             {% if request.user == user %}
+                  <a href="{% url 'user_accounts:edit_profile' %}" class="edit-profile-button">Profilini Düzenle</a>
+             {% endif %}
+          </div>
+        
+    </div>
+</section>
+<style>
+    /* profildeki edit butonu */
+
+    .edit-profile-button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 20px;
+    background-color: #5a0300;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    }
+
+    .edit-profile-button:hover {
+    background-color: #6d0000;
+    }
+
+    /* Profile */
+
+    .profile-container {
+        display: flex;
+        justify-content: center;
+        padding: 3em 0;
+      }
+      
+      .profile-card {
+        background-color: rgba(0, 0, 0, 0.6);  /* sondaki opaklık değeri */
+        color: #fff;
+        padding: 2.5em;
+        border-radius: 10px;
+        width: 50%;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        text-align: left;
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      }
+      
+      .profile-card:hover {
+        -webkit-transform: translateY(-5px);
+        -ms-transform: translateY(-5px);
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+      }
+      
+      .profile-info {
+        margin-bottom: 2em;
+      }
+      
+      .profile-card img {
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        margin-bottom: 1.5em;
+        border: 3px solid #444;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      .profile-card table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2em;
+      }
+      
+      .profile-card table td {
+        padding: 12px;
+        border-bottom: 1px solid #444;
+      }
+      
+      .profile-card table td:first-child {
+        width: 35%;
+        font-weight: bold;
+        color: #ccc;
+      }
+      
+      .profile-card table td:nth-child(2) {
+        font-size: 1.1em;
+        color: #ddd;
+      }
+      
+      .profile-card table tr:last-child td {
+        border-bottom: none;
+      }
+      
+      .profile-menu {
+        margin-top: 2em;
+        border-top: 1px solid #444;
+        padding-top: 1.5em;
+      }
+      
+      .profile-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1em;
+      }
+      
+      .profile-menu li {
+        margin: 0;
+      }
+      
+      .profile-menu a {
+        display: block;
+        text-decoration: none;
+        color: #e0e0e0;
+        padding: 1em;
+        background-color: #383838;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        text-align: center;
+      }
+      
+      .profile-menu a:hover {
+        background-color: hwb(0 0% 30%);
+        color: #fff;
+        transform: translateY(-2px);
+      }
+      
+      .bio-text {
+        line-height: 1.6;
+        color: #ddd;
+      }
+</style>
+{% endblock %}

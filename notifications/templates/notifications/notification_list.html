@@ -1,0 +1,313 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="notifications-container">
+        <h2>Bildirimlerim</h2>
+        <button id="mark-read-all-btn" class="btn btn-primary">Tümünü Okundu İşaretle</button>
+        <button id="delete-all-btn" class="btn btn-danger">Tümünü Sil</button>
+        <br>
+        <ul class="notifications-list">
+            {% for notification in notifications %}
+            <li class="notification-item {% if not notification.read %}unread{% endif %}">
+                <div class="notification-content">
+                    {% if notification.notification_type == 'haha' %}
+                        😆 {{ notification.message|safe }}
+                    {% elif notification.notification_type == 'comment' %}
+                        💬 {{ notification.message|safe }}
+                    {% elif notification.notification_type == 'dislike' %}
+                        👎 {{ notification.message|safe }}
+                    {% elif notification.notification_type == 'angry' %}
+                        😡 {{ notification.message|safe }}
+                    {% elif notification.notification_type == 'poop' %}
+                        💩 {{ notification.message|safe }}
+                    {% elif notification.notification_type == 'nauseated' %}
+                        🤢 {{ notification.message|safe }}
+                    {% elif notification.notification_type == 'message' %}
+                        📩 {{ notification.message|safe }}
+                    {% endif %}
+                    <small class="notification-date">
+                        {{ notification.created_at|date:"d M Y H:i" }}
+                    </small>
+                </div>
+                {% if notification.notification_type == 'message' %}
+                    <button class="view-message-button" onclick="window.location.href='/messages'">Mesajlarıma Git</button>
+                {% elif notification.related_object_id and notification.post %}
+                    <button class="view-post-button" onclick="window.location.href='/post/{{ notification.related_object_id }}'">Gönderiye Git</button>
+                {% endif %}
+                <button class="delete-btn" data-notification-id="{{ notification.id }}">Sil</button>
+                {% if not notification.read %}
+                    <button class="mark-read-btn" data-notification-id="{{ notification.id }}">Okundu Olarak İşaretle</button>
+                {% endif %}
+            </li>
+            {% empty %}
+                <br>
+                <h2>Henüz bir bildirim yok!!!</h2>
+            {% endfor %}
+        </ul>
+
+        {% if notifications.has_other_pages %}
+        <div class="pagination">
+            {% if notifications.has_previous %}
+                <a href="?page={{ notifications.previous_page_number }}" class="page-link">&laquo; Önceki</a>
+            {% endif %}
+
+            {% for num in notifications.paginator.page_range %}
+                {% if notifications.number == num %}
+                    <span class="current-page">{{ num }}</span>
+                {% else %}
+                    <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if notifications.has_next %}
+                <a href="?page={{ notifications.next_page_number }}" class="page-link">Sonraki &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+
+    <script>
+        
+        document.getElementById('delete-all-btn').addEventListener('click', function() {
+            const userConfirmed = confirm("Tüm bildirimleri silmek istediğinize emin misiniz?");
+            if (userConfirmed) {
+                fetch('/notifications/delete-all/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    }
+                }).then(response => response.json())
+                  .then(data => {
+                      if (data.status === 'deleted_all') {
+                          document.querySelectorAll('.notification-item').forEach(item => {
+                              item.remove();
+                          });
+                      } else {
+                          alert("Bildirimler silinemedi.");
+                      }
+                  });
+            }
+            location.reload();
+        });
+        
+        document.querySelectorAll('.view-post-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const notificationId = this.getAttribute('data-notification-id');
+                const postId = this.getAttribute('data-post-id');
+    
+                fetch(`/notifications/${notificationId}/mark-read/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    }
+                }).then(() => {
+                    this.closest('.notification-item').classList.remove('unread');
+                    window.location.href = `/post/${postId}`;
+                });
+            });
+        });
+    
+        document.querySelectorAll('.mark-read-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const notificationId = this.getAttribute('data-notification-id');
+    
+                fetch(`/notifications/${notificationId}/mark-read/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    }
+                }).then(response => response.json())
+                  .then(data => {
+                      if (data.status === 'marked') {
+                          this.closest('.notification-item').classList.remove('unread');
+                          location.reload();
+                      }
+                  });
+            });
+        });
+    
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const notificationId = this.getAttribute('data-notification-id');
+    
+                const userConfirmed = confirm("Silmek istediğinize emin misiniz?");
+                if (userConfirmed) {
+                    fetch(`/notifications/${notificationId}/delete/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        }
+                    }).then(response => response.json())
+                      .then(data => {
+                          if (data.status === 'deleted') {
+                              this.closest('.notification-item').remove();
+                          } else {
+                              alert("Bildirim silinemedi.");
+                          }
+                      });   
+                }
+                location.reload();
+            });
+        });
+
+        document.getElementById('mark-read-all-btn').addEventListener('click', function() {
+            fetch('/notifications/mark-all-read/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                }
+            }).then(response => response.json())
+            .then(data => {
+                if (data.status === 'marked') {
+                    document.querySelectorAll('.notification-item.unread').forEach(item => {
+                        item.classList.remove('unread');
+                        item.querySelector('.mark-read-btn')?.remove();
+                    });
+                }
+                location.reload();
+            });
+        });
+    </script>
+
+    <style>
+        .notifications-container {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            margin: 15px auto;
+            border-radius: 8px;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgb(48, 48, 48);
+            max-width: 1300px;
+            width: 90%; 
+            box-sizing: border-box; 
+        }
+        
+        .notifications-container h2 {
+            color: #cab7b7;
+            margin: 0 0 15px 0;
+            font-size: 1.5em;
+            border-bottom: 2px solid #5e0000;
+            padding-bottom: 10px;
+        }
+        
+        .notifications-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .notification-item {
+            width: 100%;
+            margin: 15px 0; 
+            padding: 20px;
+            background-color: rgb(31, 31, 31);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-sizing: border-box;
+        }
+        
+        .notification-content {
+            background-color: #1d1d1d;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            color: whitesmoke;
+            font-size: 1em;
+            line-height: 1.6;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .notification-item.unread {
+            background-color:rgb(94, 0, 0);
+            font-weight: bold;
+        }
+        
+        .notification-date {
+            color: #c0c0c0;
+            font-size: 12px;
+        }
+        
+        .btn, .mark-read-btn, .delete-btn, .view-post-button, .view-message-button {
+            color: #c0c0c0;
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #2d2d2d;
+            margin: 4px;
+            border-radius: 4px;
+            background-color: #1d1d1d;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn:hover, .mark-read-btn:hover, .delete-btn:hover, .view-post-button:hover, .view-message-button:hover {
+            background-color: #2d2d2d;
+            color: #c70101;
+        }
+        
+        .notification-item:hover {
+            background-color: rgb(35, 35, 35);
+        }
+        
+        /* Button container styling */
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        /* Responsive adjustments */
+        @media screen and (max-width: 768px) {
+            .notifications-container {
+                width: 95%;
+                padding: 15px;
+            }
+        
+            .notification-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Pagination Stilleri */
+
+        .pagination {
+            margin: 20px 0;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .pagination a, .pagination span {
+            color: #c0c0c0;
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #2d2d2d;
+            border-radius: 4px;
+            background-color: #1d1d1d;
+            transition: background-color 0.3s ease;
+        }
+        
+        .pagination a:hover {
+            background-color: #2d2d2d;
+            color: #c70101;
+        }
+        
+        .pagination .current-page {
+            background-color: #5e0000;
+            color: white;
+            border-color: #5e0000;
+        }
+    </style>
+{% endblock %}

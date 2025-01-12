@@ -1,0 +1,263 @@
+{% extends 'layout.html' %}
+{% block content %}
+<script>
+    function searchContacts() {
+        const input = document.getElementById('searchInput');
+        if (!input) return;
+        
+        const searchText = input.value.toLowerCase();
+        const contacts = document.querySelectorAll('.contact-item');
+        
+        contacts.forEach(contact => {
+            const username = contact.dataset.username.toLowerCase();
+            contact.style.display = username.includes(searchText) ? '' : 'none';
+        });
+    }
+
+    function sendMessage(e) {
+        e.preventDefault();
+        
+        const form = document.getElementById('messageForm');
+        const input = document.getElementById('messageInput');
+        const messagesList = document.querySelector('.messages-list');
+        const selectedUserId = new URLSearchParams(window.location.search).get('contact');
+        
+        const formData = new FormData();
+        formData.append('message', input.value);
+        formData.append('receiver_id', selectedUserId);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        
+        fetch('/messages/send/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const messageHTML = `
+                    <div class="message-item sent">
+                        <div class="message-header">
+                            <span class="message-to">${data.message.sender}</span>
+                            <span class="message-time">${data.message.timestamp|date:"d M Y, H:i}</span>
+                        </div>
+                        <div class="message-content">
+                            ${data.message.content}
+                        </div>
+                    </div>
+                `;
+                messagesList.insertAdjacentHTML('afterbegin', messageHTML);
+                input.value = '';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', searchContacts);
+        }
+
+        const messagesList = document.querySelector('.messages-list');
+        if (messagesList) {
+            messagesList.scrollTop = 0;
+        }
+
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+        
+        if (messageForm && messageInput) {
+            messageInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage(e);
+                }
+            });
+        }
+    });
+</script>
+<section class="messages-container">
+   
+    <div class="contacts-list">
+        <h3>Tüm Bokupedialılar</h3>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Kişi ara..." onkeyup="searchContacts()">
+        </div>
+        {% for contact in contacts %}
+            {% if contact != user %}
+                <div class="contact-item" data-username="{{ contact.username|lower }}">
+                    <a href="?contact={{ contact.id }}">
+                        {{ contact.username }}
+                        {% if contact.unread_count > 0 %}
+                            <span class="unread-badge">{{ contact.unread_count }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    
+    <div class="chat-section">
+        {% if selected_user %}
+            <h2>{{ selected_user.username }} ile olan sohbetim</h2>
+            
+            <div class="messages-list">
+                {% for message in messages %}
+                    <div class="message-item {% if message.sender == user %}sent{% else %}received{% endif %}">
+                        <div class="message-header">
+                            {% if message.sender == user %}
+                                <span class="message-to">{{ message.sender.username }}</span>
+                            {% else %}
+                                <span class="message-from">{{ message.sender.username }} tarafından</span>
+                            {% endif %}
+                            <span class="message-time">{{ message.timestamp|date:"d M Y, H:i" }}</span>
+                        </div>
+                        <div class="message-content">
+                            {{ message.content|safe }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <form method="post" class="message-form" id="messageForm" onsubmit="sendMessage(event)">
+                {% csrf_token %}
+                <textarea name="message" placeholder="Mesajınızı yazın..." required id="messageInput"></textarea>
+                <button type="submit">Gönder</button>
+            </form>
+            
+        {% else %}
+            <h2>Lütfen bir kişi seçin</h2>
+        {% endif %}
+    </div>
+    <style>
+        .messages-container {
+            display: flex;
+            height: 80vh;
+        }
+
+        .contacts-list {
+            width: 25%;
+            border-right: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .contact-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .contact-item a {
+            text-decoration: none;
+            color: #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .contact-item .unread-badge {
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .message-form {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+
+        .message-form textarea {
+            flex-grow: 1;
+            padding: 10px;
+            resize: vertical;
+            min-height: 40px;
+        }
+
+        .message-form button {
+            height: 40px;
+            padding: 0 20px;
+        }
+
+        .search-container {
+            margin-bottom: 15px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            color: #333;
+            box-sizing: border-box;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: #7c0000;
+            background-color: #fff;
+        }
+
+        .chat-section {
+            width: 75%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .message-item {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            max-width: max-content;
+            word-wrap: break-word;
+        }
+
+        .message-item.sent {
+            background-color: #00042b; 
+            color: #ffffff;
+            text-align: right; 
+            margin-left: auto;
+        }
+
+        .message-item.received {
+            background-color: #550007;
+            color: #ffffff; 
+            text-align: left;
+            margin-right: auto;
+        }
+
+        .message-content {
+            display: inline-block;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .message-time {
+            font-size: 0.8em;
+            color: #888;
+        }
+
+        .message-summaries {
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: gray;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</section>
+{% endblock %}

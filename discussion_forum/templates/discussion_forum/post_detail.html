@@ -1,0 +1,602 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const content = document.querySelector('.post-details-content');
+        if (content) {
+            const regex = /https:\/\/rumble\.com\/embed\/[^\s]+/g;
+            content.innerHTML = content.innerHTML.replace(regex, function(match) {
+                return `<iframe class="rumble" style="width: 100%; aspect-ratio: 16/9;" src="${match}" frameborder="0" allowfullscreen></iframe>`;
+            });
+        }
+    });
+    
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('media-upload');
+        const previewDiv = document.getElementById('media-preview');
+        
+        fileInput.addEventListener('change', function(e) {
+            const file = this.files[0];
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Dosya boyutu 5MB\'dan küçük olmalıdır');
+                this.value = '';  
+                previewDiv.innerHTML = '';  
+                return;
+            }
+            
+            previewDiv.innerHTML = `
+                <div class="file-info">
+                    <i class="fas fa-image"></i>
+                    <span class="file-name">${file.name}</span>
+                    <button type="button" class="remove-file">×</button>
+                </div>`;
+            
+            const removeButton = previewDiv.querySelector('.remove-file');
+            removeButton.addEventListener('click', function() {
+                fileInput.value = '';
+                previewDiv.innerHTML = '';
+            });
+        });
+    });
+    
+    function validateForm() {
+        const commentContent = document.getElementById("comment_content").value.trim();
+        const mediaUpload = document.getElementById("media-upload").files.length;
+    
+        if (commentContent !== "" || mediaUpload > 0) {
+            return true; 
+        }
+    
+        alert("Yorum yazmalı veya medya yüklemelisiniz!");
+        return false; 
+    }
+    
+</script>
+
+<div class="post-details-topic">
+    <h2 class="post-details-topic-header">{{ post.title }}</h2>
+    <div class="post-details-post-header">
+        <div class="post-author-section">
+            <h2><strong>Yazar:</strong> {{ post.author }}</h2>
+            {% if post.author == request.user %}
+                <form method="post" class="delete-post-form">
+                    {% csrf_token %}
+                    <button type="submit" name="delete_post" class="delete-post-btn" onclick="return confirm('Bu gönderiyi silmek istediğinizden emin misiniz?')">Gönderiyi Sil</button>
+                </form>
+            {% endif %}
+        </div>
+        <div class="post-date-section">
+            <h2><strong>Oluşturulma Tarihi:</strong> {{ post.created_at }}</h2>
+        </div>
+    </div>
+    
+    
+    <hr>
+    <section class="post-details-content">
+        {{ post.content|safe }}
+        
+        {% if post.media_data %}
+            <div class="post-media">
+                <img src="data:{{ post.media_type }};base64,{{ post.media_data }}" 
+                     alt="Post media" 
+                     class="post-media-image">
+            </div>
+        {% endif %}
+    </section>
+    
+    <br><hr>
+
+    <div class="haha-section">
+        <form method="post" style="display: inline; position: relative;">
+            {% csrf_token %}
+            <button type="submit" name="haha" class="haha-btn {% if user_hahas %}hahad{% endif %}">
+                <span class="haha-count">{{ hahas_count }}</span>
+                <span class="haha-emoji">😆</span>
+            </button>
+            
+            <div class="tooltip">
+                {% if post.hahas.all %}
+                    <strong>Haha</strong>
+                    <div class="tooltip-users">
+                        {% for haha in post.hahas.all %}
+                            <span class="tooltip-user">{{ haha.user.username }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    
+    <div class="dislike-section">
+        <form method="post" style="display: inline; position: relative;">
+            {% csrf_token %}
+            <button type="submit" name="dislike" class="dislike-btn {% if user_dislikes %}disliked{% endif %}">
+                <span class="dislike-count">{{ dislikes_count }}</span>
+                <span class="dislike-emoji">👎</span>
+            </button>
+            
+            <div class="tooltip">
+                {% if post.dislikes.all %}
+                    <strong>Beğenmedim</strong>
+                    <div class="tooltip-users">
+                        {% for dislike in post.dislikes.all %}
+                            <span class="tooltip-user">{{ dislike.user.username }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    
+      
+    <div class="angry-section">
+        <form method="post" style="display: inline; position: relative;">
+            {% csrf_token %}
+            <button type="submit" name="angry" class="angry-btn {% if user_angries %}angried{% endif %}">
+                <span class="angry-count">{{ angries_count }}</span>
+                <span class="angry-emoji">😠</span>
+            </button>
+            <div class="tooltip">
+                {% if post.angries.all %}
+                    <strong>Kızgın</strong>
+                    <div class="tooltip-users">
+                        {% for angry in post.angries.all %}
+                            <span class="tooltip-user">{{ angry.user.username }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    
+    <div class="poop-section">
+        <form method="post" style="display: inline; position: relative;">
+            {% csrf_token %}
+            <button type="submit" name="poop" class="poop-btn {% if user_poops %}pooped{% endif %}">
+                <span class="poop-count">{{ poops_count }}</span>
+                <span class="poop-emoji">💩</span>
+            </button>
+            <div class="tooltip">
+                {% if post.poops.all %}
+                    <strong>Bok</strong>
+                    <div class="tooltip-users">
+                        {% for poop in post.poops.all %}
+                            <span class="tooltip-user">{{ poop.user.username }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <div class="nauseated-section">
+        <form method="post" style="display: inline; position: relative;">
+            {% csrf_token %}
+            <button type="submit" name="nauseated" class="nauseated-btn {% if user_nauseateds %}nauseated{% endif %}">
+                <span class="nauseated-count">{{ nauseateds_count }}</span>
+                <span class="nauseated-emoji">🤢</span>
+            </button>
+            <div class="tooltip">
+                {% if post.nauseateds.all %}
+                    <strong>Öğhh</strong>
+                    <div class="tooltip-users">
+                        {% for nauseated in post.nauseateds.all %}
+                            <span class="tooltip-user">{{ nauseated.user.username }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    
+    <h3>Yorumlar</h3>
+    {% if comments %}
+        {% for comment in comments %}
+            <div class="comment">
+                <div class="comment-header">
+                    <strong>{{ comment.author }}</strong> -
+                    <span>{{ comment.created_at }}</span>
+                </div>
+                <div class="comment-body">
+                    <p>{{ comment.content|safe }}</p>
+                    {% if comment.media_data %}
+                        <img src="data:{{ comment.media_type }};base64,{{ comment.media_data }}" 
+                            alt="Comment media" 
+                            style="max-width: 500px; max-height: 500px;">
+                    {% endif %}
+                    {% if request.user == comment.author %}
+                        <div class="comment-actions">
+                            <button class="edit-comment-btn" onclick="showEditForm({{ comment.id }})">Düzenle</button>
+                            <form method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                                <button type="submit" name="delete_comment" class="delete-comment-btn" 
+                                        onclick="return confirm('Bu yorumu silmek istediğinizden emin misiniz?')">Sil</button>
+                            </form>
+                        </div>
+                        
+                        <form method="post" id="edit-form-{{ comment.id }}" class="edit-form" style="display: none;">
+                            {% csrf_token %}
+                            <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                            <div class="django-ckeditor-widget">
+                                <textarea name="edited_content" class="custom-textarea">{{ comment.content|safe }}</textarea>
+                            </div>
+                            <button type="submit" name="edit_comment" class="submit-comment-btn">Kaydet</button>
+                            <button type="button" onclick="hideEditForm({{ comment.id }})" class="cancel-btn">İptal</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h4>Henüz yorum yapılmamış.</h4>
+    {% endif %}
+
+    <!-- Yorum Formu -->
+    <form method="post" class="comment-form" enctype="multipart/form-data" onsubmit="return validateForm()">
+        {% csrf_token %}
+        <textarea name="comment_content" id="comment_content" class="custom-textarea" placeholder="Yorumunuzu yazın..."></textarea>
+        
+        <div class="media-upload">
+            <input type="file" name="media" id="media-upload" accept="image/*" style="display: none;">
+            <label for="media-upload" class="media-upload-btn">
+                <i class="fas fa-image"></i> Resim/Gif Ekle
+            </label>
+            <div id="media-preview"></div>
+        </div>        
+        
+        <button type="submit" name="comment" class="submit-comment-btn">Yorum Yap</button>
+    </form>
+
+</div>
+
+<style>
+
+    /* Haha ve Dislike Bölümleri */
+    .haha-section, .dislike-section {
+        display: inline-block;
+        position: relative;
+        margin-right: 20px;
+    }
+
+    .haha-btn, .dislike-btn {
+        position: relative;
+        padding: 5px 8px;
+        font-size: 14px;
+        cursor: pointer;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        transition: background-color 0.3s, transform 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .haha-btn:hover, .dislike-btn:hover {
+        background-color: #e0e0e0;
+        transform: scale(1.05);
+    }
+
+    .haha-count, .dislike-count {
+        font-size: 14px;
+        color: #000;
+    }
+
+    .haha-emoji, .dislike-emoji {
+        font-size: 18px; 
+    }
+
+    .tooltip {
+        display: none;
+        position: absolute;
+        background-color: #333;
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        min-width: 150px;
+        z-index: 1000;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .tooltip::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 0 5px 5px 5px;
+        border-style: solid;
+        border-color: transparent transparent #333 transparent;
+    }
+
+    .tooltip-users {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-top: 5px;
+    }
+
+    .tooltip-user {
+        font-size: 12px;
+        padding: 2px 5px;
+        background-color: #444;
+        border-radius: 3px;
+    }
+
+    .haha-section:hover .tooltip,
+    .dislike-section:hover .tooltip,
+    .angry-section:hover .tooltip,
+    .poop-section:hover .tooltip,
+    .nauseated-section:hover .tooltip {
+        display: block;
+    }
+
+
+    /* Yorumlar Kısmı */
+    .comment {
+        background-color: #232323;
+        border: 1px solid #af9595;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+    }
+
+    .comment-header {
+        font-weight: bold;
+        color: #aeff00;
+    }
+
+    .comment-body {
+        font-size: 14px;
+        margin-top: 5px;
+        color: #dddddd;
+    }
+
+    /* Yorum Formu */
+    .comment-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .custom-textarea {
+        padding: 10px;
+        font-size: 14px;
+        resize: vertical;
+        border-radius: 5px;
+        border: 1px solid #af9595;
+        min-height: 100px;
+        background-color: #232323;
+        color: #fff;
+    }
+
+    .custom-textarea:focus {
+        outline: none;
+        border-color: #ff0000;
+    }
+
+    .submit-comment-btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #ff00008f;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        align-self: flex-end;
+    }
+
+    .submit-comment-btn:hover {
+        background-color: #ff000075;
+    }
+
+    .comment-actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .edit-comment-btn, .delete-comment-btn {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    .edit-comment-btn {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .delete-comment-btn {
+        background-color: #f44336;
+        color: white;
+    }
+
+    .cancel-btn {
+        background-color: #808080;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .edit-form {
+        margin-top: 10px;
+    }
+
+    /* Genel */
+    .post-details-topic {
+        background-color: #121212;
+        padding: 2em;
+        border-radius: 8px;
+        margin: 2em auto;
+        width: 80%;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .post-details-topic-header h2 {
+        font-size: 2em;
+        margin-bottom: 0.5em;
+        color: #fff;
+    }  
+
+    .post-details-post-header p {
+        margin: 0;
+    }
+
+    .post-details-post-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1em;
+        font-size: 0.9em;
+        color: #696969;
+    }
+
+    .post-details-post-header strong {
+        color: #e0e0e0;
+    }
+
+    .post-details-content {
+        font-size: 1.2em;
+        line-height: 1.6;
+        margin-bottom: 1em;
+    }
+
+    /* Angry, Poop ve Nauseated için Butonlar */
+    .angry-section, .poop-section, .nauseated-section {
+        display: inline-block;
+        position: relative;
+        margin-right: 20px;
+    }
+
+    .angry-btn, .poop-btn, .nauseated-btn {
+        position: relative;
+        padding: 5px 8px;
+        font-size: 14px;
+        cursor: pointer;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        transition: background-color 0.3s, transform 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .angry-btn:hover, .poop-btn:hover, .nauseated-btn:hover {
+        background-color: #e0e0e0;
+        transform: scale(1.05);
+    }
+
+    .angry-count, .poop-count, .nauseated-count {
+        font-size: 14px;
+        color: #000;
+    }
+
+    .angry-emoji, .poop-emoji, .nauseated-emoji {
+        font-size: 18px;
+    }
+
+    /* delete button */
+
+    .delete-post-btn {
+        padding: 5px 10px;
+        font-size: 14px;
+        background-color: #f44336;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    
+    .delete-post-btn:hover {
+        background-color: #d32f2f;
+    }
+    
+    /* Media Upload */
+    .media-upload {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    }
+
+    .media-upload-btn {
+    padding: 8px 15px;
+    background-color: #444;
+    color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .media-upload-btn:hover {
+    background-color: #555;
+    transform: scale(1.05);
+    }
+
+    .file-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #333;
+        padding: 6px 12px;
+        border-radius: 4px;
+        margin-left: 10px;
+    }
+    
+    .file-name {
+        color: #fff;
+        font-size: 14px;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .remove-file {
+        background: none;
+        border: none;
+        color: #ff4444;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 0 4px;
+    }
+    
+    .remove-file:hover {
+        color: #ff0000;
+    }
+
+    /* Kullanicilarin post paylasirken girdigi medya */
+
+    .post-media {
+        margin-top: 20px;
+        text-align: left;
+    }
+    
+    .post-media-image {
+        max-width: 500px;
+        max-height: 500px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}

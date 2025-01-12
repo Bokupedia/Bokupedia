@@ -1,0 +1,85 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block content %}
+{% if user.is_authenticated %}
+<style>
+      .contents-categories h2 {
+        padding-left: 8px;
+      }
+      
+      .contents-categories ul {
+        list-style-type: none;
+        padding: 8px;
+        display: flex;
+        gap: 12px;
+        flex-direction: column;
+      }
+      
+      .contents-categories ul li {
+        padding: 8px 16px;
+        background-color: #3f3f3f;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+      
+      .contents-categories li:hover {
+        background-color: #8f0303;
+      }
+      
+      .contents-categories a {
+        color: #cab7b7;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      
+      .contents-categories ul ul {
+        margin-left: 12pxpx;
+        margin-top: 8px;
+      }
+
+      .contents-container {
+        display: flex;
+        justify-content: center;
+        min-height: 80vh;
+        padding: 3em 0;
+    }
+    
+    .contents-card {
+        width: 100%;
+        max-width: 800px;
+        background-color: rgba(0, 0, 0, 0.6);  /* sondaki opaklık değeri */
+        padding: 2.5em;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        color: #e0e0e0;
+    }
+    
+</style>
+<main class="contents-container">
+    <div class="contents-card">
+        
+        <section class="contents-categories">
+            <h2>İçeriklerimiz</h2>
+            <ul>
+                {% for category in categories %}
+                <li>
+                    <a href="{% url 'discussion_forum:category_topics' category_id=category.id %}">
+                        {{ category.name }}
+                    </a>
+                </li>
+                {% empty %}
+                <li>Hiçbir içerik bulunamadı.</li>
+                {% endfor %}
+            </ul>
+        </section>
+        
+    </div>
+</main>
+{% else %}
+<main class="auth-container">
+    <section class="auth">
+        <h2>Tüm İçerikleri Görmek İçin Giriş Yapın!</h2>
+    </section>
+</main>
+{% endif %}
+{% endblock %}

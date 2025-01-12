@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+<nav>
+    <ul>
+        {% if user.is_authenticated %}
+            <meta http-equiv="refresh" content="0; url={% url 'user_accounts:profile' user_id=user.id %}" />
+        {% else %}
+            <li><a href="{% url 'user_accounts:login'%}">Giriş yap</a></li>
+            <li><a href="{% url 'user_accounts:register' %}">Üye ol</a></li>
+        {% endif %}
+    </ul>                   
+</nav>
+{% endblock %}

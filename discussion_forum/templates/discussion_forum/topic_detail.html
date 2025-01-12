@@ -1,0 +1,183 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  .red-underlined {
+    color: #e50202;
+    text-decoration: underline;
+}
+
+  .topic-posts {
+    max-width: 1200px;
+    width: 100%;
+    margin: 30px auto 60px auto;
+    padding: 20px;
+    background-color: #121212;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
+  }
+
+  .topic-posts h2 {
+    color: #cab7b7;
+    border-bottom: 2px solid #5e0000;
+    padding-bottom: 10px;
+  }
+
+  .topic-posts ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .topic-posts li {
+    background-color: rgb(27, 27, 27);
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .topic-posts a {
+    color: #b1b1b1;
+    text-decoration: none;
+  }
+
+  .topic-posts a:hover {
+    color: #e50202;
+  }
+
+  .topic-posts small {
+    color: #6c757d;
+  }
+
+  .pagination {
+      margin: 20px 0;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+  }
+
+  .pagination a, .pagination span {
+      color: #c0c0c0;
+      padding: 8px 16px;
+      text-decoration: none;
+      border: 1px solid #2d2d2d;
+      border-radius: 4px;
+      background-color: #1d1d1d;
+      transition: background-color 0.3s ease;
+  }
+
+  .pagination a:hover {
+      background-color: #2d2d2d;
+      color: #c70101;
+  }
+
+  .pagination .current-page {
+      background-color: #5e0000;
+      color: white;
+      border-color: #5e0000;
+  }
+
+  .topic-post-card {
+    background-color: hsl(0, 87%, 9%);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+
+  .topic-post-headers {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1em;
+    font-size: 0.9em;
+    color: #696969;
+  }
+
+  .topic-post-card a {
+    color: white !important;
+  }
+
+  .topic-post-card a:hover {
+    color: white !important;
+  }
+
+  .topic-post-headers p {
+    margin: 0;
+  }
+
+  .topic-post-headers strong {
+    color: #e0e0e0;
+  }
+
+  .topic-post-content {
+    font-size: 1em;
+    color: #ddd;
+    line-height: 1.6;
+  }
+
+  .topic-no-post {
+    color: #888;
+    font-style: italic;
+    text-align: center;
+    padding: 1em 0;
+  }
+</style>
+
+{% if  topic.content|striptags|cut:" "|cut:"&nbsp;"|cut:"-" %}
+<main>
+{% endif %}
+  {% if not topic.content|striptags|cut:" "|cut:"&nbsp;"|cut:"-" %}
+  {% else %}
+    <section class="topic-posts">
+      <div class="topic-header">
+        <p class="topic-content">{{ topic.content|safe }}</p>
+      </div>
+    </section>
+  {% endif %}
+ <section class="topic-posts">
+   <h2>Gönderiler</h2>
+   <ul>
+     {% for post in posts %}
+     <li class="topic-post-card">
+        <div class="topic-post-headers">
+          <p><strong>{{ post.author.username }} tarafından {{ post.created_at|date:"d M Y H:i" }} tarihinde paylaşıldı.</strong></p>
+        </div>
+        <p class="topic-post-content">{{ post.content|striptags|escape|truncatewords:10 }}</p>
+
+        <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}">
+        <b><i><span style="color:#e50202;" class="red-underlined">Daha fazlası için tıkla...</span></i></b>
+        
+        </a>
+      </li>
+     {% empty %}
+     <li class="topic-no-post">Bu kontent ile alakalı bir gönderi yok.</li>
+     {% endfor %}
+   </ul>
+   <!-- Pagination -->
+   {% if posts.has_other_pages %}
+   <div class="pagination">
+       {% if posts.has_previous %}
+           <a href="?page={{ posts.previous_page_number }}" class="page-link">&laquo; Önceki</a>
+       {% endif %}
+
+       {% for num in posts.paginator.page_range %}
+           {% if posts.number == num %}
+               <span class="current-page">{{ num }}</span>
+           {% else %}
+               <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+           {% endif %}
+       {% endfor %}
+
+       {% if posts.has_next %}
+           <a href="?page={{ posts.next_page_number }}" class="page-link">Sonraki &raquo;</a>
+       {% endif %}
+   </div>
+   {% endif %}
+ </section>
+{% if  topic.content|striptags|cut:" "|cut:"&nbsp;"|cut:"-" %}
+</main>
+{% endif %}
+{% endblock %}

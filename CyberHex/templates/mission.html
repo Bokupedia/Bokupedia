@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block content %}
+<main class="mission-container">
+   <div class="mission-card">
+      <img src="{% static 'images/bandofhawk.jpeg' %}" alt="Band of Hawk" />
+      <h2>Bok of 35 Discord temelli bir eğlence kuruluşudur. 04/12/2022 tarihinde Yiğit Anıl Tırpancı tarafından kurulmuştur. Eğlencenin merkezi olan sunucumuzda kapımız herkese açıktır, hiç kimseye din, dil, ırk, yaş fark etmeksizin eşit şekilde yaklaşılır ve saygı gösterilir. (şüpheli)</h2>
+      <h2>Hayattan zevk almıyor musunuz? En son yüzünüz güleli haftalar hatta aylar mı oldu? İnternet etmeye mi meyillisiniz? Sorun değil, Bok of 35 burada!</h2>
+      <h2>Bok of 35 boş zamanlarınızda arkadaşlarınızla vakit geçirebileceğiniz, yeni arkadaşlıklar kurup sosyal çevrenizi genişletebileceğiniz harika bir sunucu! Her gün dönen harika contentler, dünyaca ünlü şaklabanlar, (ÖYY) her gün esen komedi tufanı, kahkaha şelalesi, mizah şovun yanı sıra birbirinden müthiş oyunlar oynayarak hayattan tekrardan zevk almanızı sağlamamız bizler için çocuk oyuncağı! (31 çekmekten sivilcelenen yüzünüzü güldürmek bizim işimiz!)</h2>
+   </div>
+</main>
+<style>
+   
+.mission-container {
+    display: flex;
+    justify-content: center;
+    padding: 3em 0;
+}
+
+.mission-card {
+    background-color: rgba(0, 0, 0, 0.6);  /* sondaki opaklık değeri */
+    color: #fff;
+    padding: 2.5em;
+    border-radius: 10px;
+    width: 50%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    text-align: left;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.mission-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+}
+
+.mission-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 1.5em;
+    border: 3px solid #444;
+}
+
+.mission-card h2 {
+    color: #ddd;
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-bottom: 1.5em;
+}
+
+.mission-card h2:last-child {
+    margin-bottom: 0;
+}
+
+@media screen and (max-width: 768px) {
+    .mission-card {
+        width: 90%;
+        padding: 1.5em;
+    }
+}
+</style>
+
+{% endblock %}
