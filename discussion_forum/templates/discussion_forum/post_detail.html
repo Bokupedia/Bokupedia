@@ -56,6 +56,47 @@
         return false; 
     }
     
+    let editor;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        ClassicEditor
+            .create(document.querySelector('#editor'), {
+                'toolbar': [
+                    
+                    'bold', 'italic',
+                    '|',
+                    'bulletedList', 'numberedList',
+                    '|', 
+                    'link',
+                    '|',
+                    'undo', 'redo',
+                    '|',
+                ],
+            })
+            .then(newEditor => {
+                editor = newEditor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+    
+
+    function showPostEditForm() {
+        document.getElementById('edit-post-form').style.display = 'block';
+        if (editor) {
+            editor.setData(`{{ post.content|safe|escapejs }}`);
+        }
+    }
+
+    function hidePostEditForm() {
+        document.getElementById('edit-post-form').style.display = 'none';
+    }
+
+    function saveContent() {
+        const content = editor.getData();
+        document.getElementById('edited-content').value = content;
+    }
 </script>
 
 <div class="post-details-topic">
@@ -64,9 +105,22 @@
         <div class="post-author-section">
             <h2><strong>Yazar:</strong> {{ post.author }}</h2>
             {% if post.author == request.user or request.user.is_staff %}
-                <form method="post" class="delete-post-form">
+                <div class="post-actions">
+                    <button class="edit-post-btn" onclick="showPostEditForm()">Gönderiyi Düzenle</button>
+                    <form method="post" class="delete-post-form">
+                        {% csrf_token %}
+                        <button type="submit" name="delete_post" class="delete-post-btn" onclick="return confirm('Bu gönderiyi silmek istediğinizden emin misiniz?')">Gönderiyi Sil</button>
+                    </form>
+                </div>
+        
+                <form method="post" id="edit-post-form" class="edit-form" style="display: none;">
                     {% csrf_token %}
-                    <button type="submit" name="delete_post" class="delete-post-btn" onclick="return confirm('Bu gönderiyi silmek istediğinizden emin misiniz?')">Gönderiyi Sil</button>
+                    <div id="editor"></div>
+                    <input type="hidden" name="edited_post_content" id="edited-content">
+                    <div class="form-buttons">
+                        <button type="submit" name="edit_post" class="submit-post-btn" onclick="saveContent()">Kaydet</button>
+                        <button type="button" onclick="hidePostEditForm()" class="cancel-btn">İptal</button>
+                    </div>
                 </form>
             {% endif %}
         </div>
@@ -597,6 +651,103 @@
         max-width: 500px;
         max-height: 500px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Edit post */
+
+    .post-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .edit-post-btn {
+        padding: 5px 10px;
+        font-size: 14px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    
+    .edit-post-btn:hover {
+        background-color: #45a049;
+    }
+    
+    .submit-post-btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+    
+    .submit-post-btn:hover {
+        background-color: #45a049;
+    }
+    
+    .post-author-section .edit-form {
+        margin-top: 15px;
+        background-color: #232323;
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px solid #af9595;
+    }
+    
+    .delete-post-form {
+        display: inline;
+    }
+
+    
+    /* CKEditor */
+    .ck.ck-editor {
+        width: 100% !important;
+        max-width: 100%;
+        margin-bottom: 20px;
+        min-width: 1000px !important; 
+
+    }
+
+    .ck.ck-editor__main > .ck-editor__editable {
+        min-height: 500px !important; /
+        max-height: 800px !important; 
+        min-width: 1000px !important;
+        padding: 2em !important; 
+        font-size: 16px !important; 
+    }
+
+    .ck.ck-toolbar {
+        padding: 10px !important; 
+        font-size: 15px !important; 
+    }
+
+    .ck.ck-toolbar .ck-button {
+        padding: 8px 12px !important; 
+        margin: 2px !important; 
+    }
+
+    .edit-form {
+        margin: 20px 0;
+        padding: 20px;
+        width: 100%;
+        margin: 0 auto; 
+        weight: 100%;
+    }
+    
+    .form-buttons {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+    }
+    
+    .ck-content {
+        min-height: 300px;
+        background: #fff;
+        min-weight: 500px;
     }
 </style>
 {% endblock %}

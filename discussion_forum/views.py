@@ -153,7 +153,14 @@ def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
 
     if request.method == 'POST':
-        if 'delete_post' in request.POST:
+        if 'edit_post' in request.POST:
+            if post.author == request.user or request.user.is_staff:
+                edited_content = request.POST.get('edited_post_content')
+                post.content = edited_content
+                post.save()
+                return redirect('discussion_forum:post_detail', post_id=post.id)
+            
+        elif 'delete_post' in request.POST:
             if post.author == request.user or request.user.is_staff:
                 post.delete()
                 return redirect('discussion_forum:forum_index') 
