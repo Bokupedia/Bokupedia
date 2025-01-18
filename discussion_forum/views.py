@@ -5,6 +5,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Topic, Category, Post
+from django.db.models.functions import Lower
 from user_accounts.models import User
 from notifications.models import Notification
 from post_interactions.models import (
@@ -110,8 +111,8 @@ def forum_index(request):
     categories = Category.objects.prefetch_related('topics').all()
     all_posts = Post.objects.select_related('author', 'topic', 'topic__category').order_by('-created_at')
     
-    # Tüm kullanıcıları al (mevcut kullanıcı hariç)
-    all_users = User.objects.exclude(id=request.user.id).order_by('username')
+    # Tüm kullanıcıları al
+    all_users = User.objects.order_by(Lower('username'))
     
     # Arama fonksiyonu
     search_query = request.GET.get('search', '').lower()

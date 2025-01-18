@@ -48,7 +48,7 @@
                 </a>
               </li>
               <li><a href="{% url 'post_interactions:profile_posts' %}">Gönderilerim</a></li>
-              <li><a href="{% url 'user_accounts:profile' request.user.username %}">Profilim</a></li>
+              <li><a href="{% url 'user_accounts:profile' request.user.username %}">Profilim, {{request.user.username}}</a></li>
               <li><a href="{% url 'user_accounts:logout' %}">Çıkış yap</a></li>
             {% else %}
               <li><a href="/accounts/login">Giriş yap</a></li>

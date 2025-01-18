@@ -89,7 +89,7 @@ def notification_list(request):
     
     # Check post information for each notification
     for notification in notifications:
-        if notification.notification_type in ['haha', 'comment', 'dislike'] and notification.related_object_id:
+        if notification.related_object_id:
             try:
                 post = Post.objects.get(id=notification.related_object_id)
                 notification.post = post
@@ -97,9 +97,9 @@ def notification_list(request):
                 notification.post = None
         else:
             notification.post = None
-            
-    return render(request, 'notifications/notification_list.html', {
-        'notifications': notifications
+                
+        return render(request, 'notifications/notification_list.html', {
+            'notifications': notifications
     })
 
 # Bildirim Okundu Olarak İşaretleme

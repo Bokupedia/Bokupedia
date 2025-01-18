@@ -8,42 +8,48 @@
         <br>
         <ul class="notifications-list">
             {% for notification in notifications %}
-            <li class="notification-item {% if not notification.read %}unread{% endif %}">
-                <div class="notification-content">
-                    {% if notification.notification_type == 'haha' %}
-                        😆 {{ notification.message|safe }}
-                    {% elif notification.notification_type == 'comment' %}
-                        💬 {{ notification.message|safe }}
-                    {% elif notification.notification_type == 'dislike' %}
-                        👎 {{ notification.message|safe }}
-                    {% elif notification.notification_type == 'angry' %}
-                        😡 {{ notification.message|safe }}
-                    {% elif notification.notification_type == 'poop' %}
-                        💩 {{ notification.message|safe }}
-                    {% elif notification.notification_type == 'nauseated' %}
-                        🤢 {{ notification.message|safe }}
-                    {% elif notification.notification_type == 'message' %}
-                        📩 {{ notification.message|safe }}
+                <li class="notification-item {% if not notification.read %}unread{% endif %}">
+                    <div class="notification-content">
+                        {% if notification.notification_type == 'haha' %}
+                            😆 {{ notification.message|safe }}
+                        {% elif notification.notification_type == 'comment' %}
+                            💬 {{ notification.message|safe }}
+                        {% elif notification.notification_type == 'dislike' %}
+                            👎 {{ notification.message|safe }}
+                        {% elif notification.notification_type == 'angry' %}
+                            😡 {{ notification.message|safe }}
+                        {% elif notification.notification_type == 'poop' %}
+                            💩 {{ notification.message|safe }}
+                        {% elif notification.notification_type == 'nauseated' %}
+                            🤢 {{ notification.message|safe }}
+                        {% elif notification.notification_type == 'message' %}
+                            📩 {{ notification.message|safe }}
+                        {% endif %}
+                        <small class="notification-date">
+                            {{ notification.created_at|date:"d M Y H:i" }}
+                        </small>
+                    </div>
+        
+                    {% if notification.notification_type == 'message' %}
+                        <!-- Mesaj bildirimleri için buton -->
+                        <button class="view-messages-btn" data-notification-id="{{ notification.id }}" data-user-id="{{ notification.related_object_id }}">Mesajlarım'a Git</button>
+                    {% elif notification.related_object_id and notification.post %}
+                        <!-- Diğer bildirimler için gönderiye git butonu -->
+                        <button class="view-post-btn" data-notification-id="{{ notification.id }}" data-post-id="{{ notification.related_object_id }}">Gönderiye Git</button>
                     {% endif %}
-                    <small class="notification-date">
-                        {{ notification.created_at|date:"d M Y H:i" }}
-                    </small>
-                </div>
-                {% if notification.notification_type == 'message' %}
-                    <button class="view-message-button" onclick="window.location.href='/messages'">Mesajlarıma Git</button>
-                {% elif notification.related_object_id and notification.post %}
-                    <button class="view-post-button" onclick="window.location.href='/post/{{ notification.related_object_id }}'">Gönderiye Git</button>
-                {% endif %}
-                <button class="delete-btn" data-notification-id="{{ notification.id }}">Sil</button>
-                {% if not notification.read %}
-                    <button class="mark-read-btn" data-notification-id="{{ notification.id }}">Okundu Olarak İşaretle</button>
-                {% endif %}
-            </li>
+                    
+                    <button class="delete-btn" data-notification-id="{{ notification.id }}">Sil</button>
+                    
+                    {% if not notification.read %}
+                        <button class="mark-read-btn" data-notification-id="{{ notification.id }}">Okundu Olarak İşaretle</button>
+                    {% endif %}
+                </li>
             {% empty %}
                 <br>
                 <h2>Henüz bir bildirim yok!!!</h2>
             {% endfor %}
         </ul>
+        
 
         {% if notifications.has_other_pages %}
         <div class="pagination">
@@ -68,7 +74,13 @@
     </div>
 
     <script>
-        
+        document.querySelectorAll('.view-messages-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location = '/messages';
+            });
+        });
+
         document.getElementById('delete-all-btn').addEventListener('click', function() {
             const userConfirmed = confirm("Tüm bildirimleri silmek istediğinize emin misiniz?");
             if (userConfirmed) {
@@ -91,83 +103,96 @@
             location.reload();
         });
         
-        document.querySelectorAll('.view-post-btn').forEach(button => {
-            button.addEventListener('click', function() {
+       document.querySelectorAll('.view-post-btn').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.preventDefault();
                 const notificationId = this.getAttribute('data-notification-id');
                 const postId = this.getAttribute('data-post-id');
-    
-                fetch(`/notifications/${notificationId}/mark-read/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                    }
-                }).then(() => {
-                    this.closest('.notification-item').classList.remove('unread');
-                    window.location.href = `/post/${postId}`;
-                });
-            });
-        });
-    
-        document.querySelectorAll('.mark-read-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const notificationId = this.getAttribute('data-notification-id');
-    
-                fetch(`/notifications/${notificationId}/mark-read/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                    }
-                }).then(response => response.json())
-                  .then(data => {
-                      if (data.status === 'marked') {
-                          this.closest('.notification-item').classList.remove('unread');
-                          location.reload();
-                      }
-                  });
-            });
-        });
-    
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const notificationId = this.getAttribute('data-notification-id');
-    
-                const userConfirmed = confirm("Silmek istediğinize emin misiniz?");
-                if (userConfirmed) {
-                    fetch(`/notifications/${notificationId}/delete/`, {
+
+                try {
+                    await fetch(`/notifications/${notificationId}/mark-read/`, {
                         method: 'POST',
                         headers: {
                             'X-CSRFToken': '{{ csrf_token }}',
                         }
-                    }).then(response => response.json())
-                      .then(data => {
-                          if (data.status === 'deleted') {
-                              this.closest('.notification-item').remove();
-                          } else {
-                              alert("Bildirim silinemedi.");
-                          }
-                      });   
+                    });
+                    window.location = `/post/${postId}`;
+                } catch (error) {
+                    console.error('Hata:', error);
                 }
-                location.reload();
+            });
+        });
+     
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const notificationId = this.getAttribute('data-notification-id');
+        
+                const userConfirmed = confirm("Silmek istediğinize emin misiniz?");
+                if (userConfirmed) {
+                    try {
+                        const response = await fetch(`/notifications/${notificationId}/delete/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                            }
+                        });
+                        const data = await response.json();
+                        if (data.status === 'deleted') {
+                            window.location = window.location.href;
+                        } else {
+                            alert("Bildirim silinemedi.");
+                        }
+                    } catch (error) {
+                        console.error('Hata:', error);
+                        alert("Bir hata oluştu.");
+                    }
+                }
             });
         });
 
-        document.getElementById('mark-read-all-btn').addEventListener('click', function() {
-            fetch('/notifications/mark-all-read/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                }
-            }).then(response => response.json())
-            .then(data => {
-                if (data.status === 'marked') {
-                    document.querySelectorAll('.notification-item.unread').forEach(item => {
-                        item.classList.remove('unread');
-                        item.querySelector('.mark-read-btn')?.remove();
+                // Tekli bildirim için okundu olarak işaretleme
+        document.querySelectorAll('.mark-read-btn').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const notificationId = this.getAttribute('data-notification-id');
+
+                try {
+                    const response = await fetch(`/notifications/${notificationId}/mark-read/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        }
                     });
+                    const data = await response.json();
+                    if (data.status === 'marked') {
+                        window.location = window.location.href;
+                    }
+                } catch (error) {
+                    console.error('Hata:', error);
                 }
-                location.reload();
             });
         });
+
+        // Tümünü okundu olarak işaretleme
+        document.getElementById('mark-read-all-btn').addEventListener('click', async function(e) {
+            e.preventDefault();
+            try {
+                const response = await fetch('/notifications/mark-all-read/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    }
+                });
+                const data = await response.json();
+                if (data.status === 'marked') {
+                    window.location = window.location.href;
+                }
+            } catch (error) {
+                console.error('Hata:', error);
+            }
+        });
+        
     </script>
 
     <style>
@@ -238,9 +263,10 @@
             font-size: 12px;
         }
         
-        .btn, .mark-read-btn, .delete-btn, .view-post-button, .view-message-button {
+        .btn, .mark-read-btn, .delete-btn, .view-post-btn, .view-messages-btn {
             color: #c0c0c0;
             padding: 8px 16px;
+            display: inline-block;
             text-decoration: none;
             border: 1px solid #2d2d2d;
             margin: 4px;
@@ -250,7 +276,7 @@
             cursor: pointer;
         }
         
-        .btn:hover, .mark-read-btn:hover, .delete-btn:hover, .view-post-button:hover, .view-message-button:hover {
+        .btn:hover, .mark-read-btn:hover, .delete-btn:hover, .view-post-btn:hover, .view-messages-btn:hover {
             background-color: #2d2d2d;
             color: #c70101;
         }

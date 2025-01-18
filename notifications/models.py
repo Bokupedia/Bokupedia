@@ -5,7 +5,7 @@ from discussion_forum.models import Post
 
 class Notification(models.Model):
     user = models.ForeignKey(User, related_name="notifications", on_delete=models.CASCADE)
-    message = CKEditor5Field()
+    message = models.TextField() 
     read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     notification_type = models.CharField(

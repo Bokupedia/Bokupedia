@@ -38,15 +38,18 @@
                     <div class="message-item sent">
                         <div class="message-header">
                             <span class="message-to">${data.message.sender}</span>
-                            <span class="message-time">${data.message.timestamp|date:"d M Y, H:i}</span>
+                            <span class="message-time">${data.message.timestamp}</span>
                         </div>
                         <div class="message-content">
                             ${data.message.content}
                         </div>
                     </div>
                 `;
-                messagesList.insertAdjacentHTML('afterbegin', messageHTML);
+                messagesList.insertAdjacentHTML('beforeend', messageHTML);  // En alta ekleniyor
                 input.value = '';
+                
+                // Mesaj eklendikten sonra scroll'u en alta kaydırıyoruz
+                messagesList.scrollTop = messagesList.scrollHeight;
             }
         })
         .catch(error => console.error('Error:', error));
@@ -118,6 +121,7 @@
                     </div>
                 {% endfor %}
             </div>
+
             
             <form method="post" class="message-form" id="messageForm" onsubmit="sendMessage(event)">
                 {% csrf_token %}

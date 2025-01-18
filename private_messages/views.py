@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from user_accounts.models import User
 from .models import Message
 from notifications.models import Notification
+import logging
 
 @login_required(login_url='login')
 def inbox(request):
@@ -28,7 +29,7 @@ def inbox(request):
         messages = Message.objects.filter(
             (Q(sender=request.user) & Q(receiver=selected_user)) |
             (Q(sender=selected_user) & Q(receiver=request.user))
-        ).order_by('-timestamp')
+        ).order_by('timestamp')
         
         Message.objects.filter(
             sender=selected_user,
@@ -38,7 +39,7 @@ def inbox(request):
     else:
         messages = Message.objects.filter(
             Q(sender=request.user) | Q(receiver=request.user)
-        ).order_by('-timestamp')
+        ).order_by('timestamp')
         selected_user = None
 
     unread_messages_count = Message.objects.filter(
@@ -56,6 +57,8 @@ def inbox(request):
     
     return render(request, 'private_messages/inbox.html', context)
 
+logger = logging.getLogger(__name__)
+
 @login_required(login_url='login')
 def send_message(request):
     if request.method == 'POST':
@@ -70,6 +73,8 @@ def send_message(request):
                 content=message_content,
                 is_read=False
             )
+            
+            logger.info(f"Message sent from {request.user.username} to {receiver.username}: {message_content}")
             
             Notification.objects.create(
                 user=receiver,
@@ -87,6 +92,7 @@ def send_message(request):
                 }
             })
         except User.DoesNotExist:
+            logger.error(f"User with ID {receiver_id} not found.")
             return JsonResponse({'status': 'error', 'message': 'Kullanıcı bulunamadı'})
     
     return JsonResponse({'status': 'error', 'message': 'Geçersiz istek'})

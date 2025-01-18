@@ -139,7 +139,7 @@
             {% csrf_token %}
             <button type="submit" name="angry" class="angry-btn {% if user_angries %}angried{% endif %}">
                 <span class="angry-count">{{ angries_count }}</span>
-                <span class="angry-emoji">😠</span>
+                <span class="angry-emoji">😡</span>
             </button>
             <div class="tooltip">
                 {% if post.angries.all %}
