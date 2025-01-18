@@ -19,29 +19,30 @@
                     <td class="bio-text">{{ profile.bio|default:"Henüz belirtilmemiş" }}</td>
                 </tr>
             </table>
-             {% if request.user == user %}
-                  <a href="{% url 'user_accounts:edit_profile' %}" class="edit-profile-button">Profilini Düzenle</a>
-             {% endif %}
+            <a href="{% url 'user_accounts:profile_posts' username=user.username %}" class="view-posts-button">{{user.username}} Gönderileri</a>
+
+            {% if request.user == user %}
+              <a href="{% url 'user_accounts:edit_profile' %}" class="edit-profile-button">Profilini Düzenle</a>
+            {% endif %}
           </div>
         
     </div>
 </section>
 <style>
-    /* profildeki edit butonu */
-
-    .edit-profile-button {
-    display: inline-block;
-    padding: 10px 20px;
-    margin-top: 20px;
-    background-color: #5a0300;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    text-align: center;
+    /* Profildeki edit butonu */
+    .edit-profile-button, .view-posts-button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin-top: 20px;
+        background-color: #5a0300;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        text-align: center;
     }
 
-    .edit-profile-button:hover {
-    background-color: #6d0000;
+    .edit-profile-button:hover, .view-posts-button:hover {
+        background-color: #6d0000;
     }
 
     /* Profile */

@@ -63,7 +63,7 @@
     <div class="post-details-post-header">
         <div class="post-author-section">
             <h2><strong>Yazar:</strong> {{ post.author }}</h2>
-            {% if post.author == request.user %}
+            {% if post.author == request.user or request.user.is_staff %}
                 <form method="post" class="delete-post-form">
                     {% csrf_token %}
                     <button type="submit" name="delete_post" class="delete-post-btn" onclick="return confirm('Bu gönderiyi silmek istediğinizden emin misiniz?')">Gönderiyi Sil</button>
@@ -210,7 +210,7 @@
                             alt="Comment media" 
                             style="max-width: 500px; max-height: 500px;">
                     {% endif %}
-                    {% if request.user == comment.author %}
+                    {% if request.user == comment.author or request.user.is_staff %}
                         <div class="comment-actions">
                             <button class="edit-comment-btn" onclick="showEditForm({{ comment.id }})">Düzenle</button>
                             <form method="post" style="display: inline;">

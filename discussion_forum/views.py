@@ -154,7 +154,7 @@ def post_detail(request, post_id):
 
     if request.method == 'POST':
         if 'delete_post' in request.POST:
-            if post.author == request.user:
+            if post.author == request.user or request.user.is_staff:
                 post.delete()
                 return redirect('discussion_forum:forum_index') 
             
@@ -194,8 +194,8 @@ def post_detail(request, post_id):
             comment_id = request.POST.get('comment_id')
             edited_content = request.POST.get('edited_content')
             comment = get_object_or_404(Comment, id=comment_id)
-            
-            if comment.author == request.user:
+
+            if comment.author == request.user or request.user.is_staff:
                 comment.content = edited_content
                 comment.save()
                 

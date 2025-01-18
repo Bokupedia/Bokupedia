@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import User
 from django.contrib.auth import login, logout, authenticate
 from .forms import *
-
+from django.core.paginator import Paginator
 from django.contrib import messages
 
 @login_required
@@ -16,6 +16,18 @@ def profile(request, username):
             messages.warning(request, "Profiliniz eksik. Lütfen tamamlayın.")
     
     return render(request, 'profile.html', {'user': user, 'profile': profile})
+
+@login_required
+def profile_posts(request, username):
+    user = get_object_or_404(User, username=username)
+    
+    posts = user.posts.all().order_by('-created_at')
+
+    paginator = Paginator(posts, 10)  
+    page_number = request.GET.get('page')
+    posts_page = paginator.get_page(page_number)
+
+    return render(request, 'profile_posts.html', {'user': user, 'posts': posts_page})
 
 def register(request):
     if request.method == 'POST':

@@ -1,0 +1,140 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+<nav class="profile-post-container">
+    <header>
+        <h2>{{ user }} Gönderileri</h2>
+    </header>
+    <ul>
+        {% for post in posts %}
+            <li class="profile-posts">
+                <div class="profile-post-details">
+                    <h2>Başlık: {{ post.topic.category.name }} {{ post.topic }}</h2>
+                    <p>İçerik: {{ post.content|striptags|escape|truncatewords:7 }}</p>
+                    <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}">Gönderiye git</a>
+                </div>
+            </li>
+        {% empty %}
+            <li>Gönderi bulunamadı.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Pagination -->
+    {% if posts.has_other_pages %}
+        <div class="pagination">
+            {% if posts.has_previous %}
+                <a href="?page={{ posts.previous_page_number }}" class="page-link">&laquo; Önceki</a>
+            {% endif %}
+            {% for num in posts.paginator.page_range %}
+                {% if posts.number == num %}
+                    <span class="current-page">{{ num }}</span>
+                {% else %}
+                    <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if posts.has_next %}
+                <a href="?page={{ posts.next_page_number }}" class="page-link">Sonraki &raquo;</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</nav>
+
+<style>
+    .profile-post-container {
+        background-color: rgba(0, 0, 0, 0.6);
+        padding: 20px;
+        margin: 15px auto;
+        border-radius: 8px;
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgb(48, 48, 48);
+        max-width: 1300px;
+    }
+      
+    .profile-post-container header {
+        margin-bottom: 25px;
+        border-bottom: 2px solid #5e0000;
+    }
+      
+    .profile-post-container h2 {
+        color: #cab7b7;
+        margin: 0 0 15px 0;
+        font-size: 1.5em;
+    }
+
+    .profile-posts {
+        max-width: 1200px;
+        width: 100%;
+        margin: 30px auto 60px;
+        padding: 20px;
+        background-color: rgb(31, 31, 31);
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
+    }
+      
+    .profile-posts h2 {
+        color: #cab7b7;
+        border-bottom: 2px solid #5e0000;
+        padding-bottom: 10px;
+    }
+      
+    .profile-posts ul {
+        list-style-type: none;
+        padding: 0;
+    }
+      
+    .profile-post-details {
+        background-color: #1d1d1d;
+        padding: 15px;
+        margin-top: 10px;
+        border-radius: 5px;
+    }
+      
+    .profile-post-details p {
+        color: whitesmoke;
+        font-size: 1em;
+        line-height: 1.6;
+    }
+      
+    .profile-post-details a {
+        display: inline-block;
+        margin-top: 3px;
+        color: #c70101;
+        text-decoration: none;
+    }
+      
+    .profile-post-details a:hover {
+        text-decoration: solid;
+    }
+
+    /* Pagination Stilleri */
+    .pagination {
+        margin: 20px 0;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .pagination a, .pagination span {
+        color: #c0c0c0;
+        padding: 8px 16px;
+        text-decoration: none;
+        border: 1px solid #2d2d2d;
+        border-radius: 4px;
+        background-color: #1d1d1d;
+        transition: background-color 0.3s ease;
+    }
+    
+    .pagination a:hover {
+        background-color: #2d2d2d;
+        color: #c70101;
+    }
+    
+    .pagination .current-page {
+        background-color: #5e0000;
+        color: white;
+        border-color: #5e0000;
+    }
+</style>
+{% endblock %}
