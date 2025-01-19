@@ -17,3 +17,7 @@ urlpatterns = [
     path('ckeditor5/', include('django_ckeditor_5.urls')),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler403 = 'CyberHex.views.custom_403_view'
+handler404 = 'CyberHex.views.custom_404_view'
+handler500 = 'CyberHex.views.custom_500_view'

@@ -98,8 +98,8 @@ def notification_list(request):
         else:
             notification.post = None
                 
-        return render(request, 'notifications/notification_list.html', {
-            'notifications': notifications
+    return render(request, 'notifications/notification_list.html', {
+        'notifications': notifications
     })
 
 # Bildirim Okundu Olarak İşaretleme
