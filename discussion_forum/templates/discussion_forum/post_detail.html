@@ -6,14 +6,24 @@
     document.addEventListener('DOMContentLoaded', function() {
         const content = document.querySelector('.post-details-content');
         if (content) {
-            const regex = /https:\/\/rumble\.com\/embed\/[^\s]+/g;
-            content.innerHTML = content.innerHTML.replace(regex, function(match) {
+            // Add YouTube URL transformation logic
+            const youtubeRegex = /(https?:\/\/(?:www\.)?youtube\.com\/watch\?v=[^\s]+|https?:\/\/youtu\.be\/[^\s]+)/g;
+            content.innerHTML = content.innerHTML.replace(youtubeRegex, function(match) {
+                const videoId = match.includes('youtu.be')
+                    ? match.split('/').pop()
+                    : new URL(match).searchParams.get('v');
+                return `<iframe class="youtube" style="width: 100%; aspect-ratio: 16/9;" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
+            });
+
+            // Add Rumble URL transformation logic
+            const rumbleRegex = /https:\/\/rumble\.com\/embed\/[^\s]+/g;
+            content.innerHTML = content.innerHTML.replace(rumbleRegex, function(match) {
                 return `<iframe class="rumble" style="width: 100%; aspect-ratio: 16/9;" src="${match}" frameborder="0" allowfullscreen></iframe>`;
             });
         }
     });
-    
 
+    // Media upload logic for image and file handling
     document.addEventListener('DOMContentLoaded', function() {
         const fileInput = document.getElementById('media-upload');
         const previewDiv = document.getElementById('media-preview');
@@ -29,7 +39,7 @@
                 return;
             }
             
-            previewDiv.innerHTML = `
+            previewDiv.innerHTML = ` 
                 <div class="file-info">
                     <i class="fas fa-image"></i>
                     <span class="file-name">${file.name}</span>
@@ -43,26 +53,27 @@
             });
         });
     });
-    
+
+    // Comment form validation
     function validateForm() {
         const commentContent = document.getElementById("comment_content").value.trim();
         const mediaUpload = document.getElementById("media-upload").files.length;
-    
+
         if (commentContent !== "" || mediaUpload > 0) {
-            return true; 
+            return true;
         }
-    
+
         alert("Yorum yazmalı veya medya yüklemelisiniz!");
-        return false; 
+        return false;
     }
-    
+
     let editor;
 
+    // Initialize the CKEditor for post content editing
     document.addEventListener('DOMContentLoaded', function () {
         ClassicEditor
             .create(document.querySelector('#editor'), {
                 'toolbar': [
-                    
                     'bold', 'italic',
                     '|',
                     'bulletedList', 'numberedList',
@@ -80,7 +91,6 @@
                 console.error(error);
             });
     });
-    
 
     function showPostEditForm() {
         document.getElementById('edit-post-form').style.display = 'block';

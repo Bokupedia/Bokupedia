@@ -90,26 +90,6 @@ def get_topics(request, category_id):
 def forum_index(request):
     categories = Category.objects.prefetch_related('topics').all()
     all_posts = Post.objects.select_related('author', 'topic', 'topic__category').order_by('-created_at')
-
-    paginator = Paginator(all_posts, 10) 
-    page = request.GET.get('page', 1)
-
-    try:
-        latest_posts = paginator.page(page)
-    except PageNotAnInteger:
-        latest_posts = paginator.page(1)
-    except EmptyPage:
-        latest_posts = paginator.page(paginator.num_pages)
-
-    return render(request, 'discussion_forum/forum_index.html', {
-        'categories': categories,
-        'latest_posts': latest_posts,
-    })
-
-@login_required
-def forum_index(request):
-    categories = Category.objects.prefetch_related('topics').all()
-    all_posts = Post.objects.select_related('author', 'topic', 'topic__category').order_by('-created_at')
     
     # Tüm kullanıcıları al
     all_users = User.objects.order_by(Lower('username'))
