@@ -91,10 +91,8 @@ def forum_index(request):
     categories = Category.objects.prefetch_related('topics').all()
     all_posts = Post.objects.select_related('author', 'topic', 'topic__category').order_by('-created_at')
     
-    # Tüm kullanıcıları al
     all_users = User.objects.order_by(Lower('username'))
     
-    # Arama fonksiyonu
     search_query = request.GET.get('search', '').lower()
     if search_query:
         all_users = all_users.filter(username__icontains=search_query)
@@ -119,13 +117,22 @@ def forum_index(request):
 def category_topics(request, category_id):
     category = get_object_or_404(Category, id=category_id)
     topics = category.topics.all().order_by('title')
-    
     direct_posts = Post.objects.filter(category=category, topic__isnull=True).order_by('-created_at')
+    
+    paginator = Paginator(direct_posts, 5)  
+    page = request.GET.get('page', 1)
+
+    try:
+        paginated_posts = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_posts = paginator.page(1)
+    except EmptyPage:
+        paginated_posts = paginator.page(paginator.num_pages)
     
     return render(request, 'discussion_forum/category_topics.html', {
         'category': category,
         'topics': topics,
-        'direct_posts': direct_posts,
+        'direct_posts': paginated_posts, 
     })
 
 @login_required
