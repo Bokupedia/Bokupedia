@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-97&w1m6fw*uww*sblgwv)as-+d!1tz@q-z^(5bx9xf0tv%8+oo'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -163,5 +163,3 @@ AUTH_USER_MODEL = 'user_accounts.User'
 LOGIN_REDIRECT_URL = "/"
 
 LOGOUT_REDIRECT_URL = "/"
-
-ALLOWED_HOSTS = ['Bokupedia.pythonanywhere.com']

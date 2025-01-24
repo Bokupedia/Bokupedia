@@ -66,7 +66,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="content">İçerik: (Videolar için lütfen sadece YouTube linki yapıştırınız)</label>
+            <label for="content">İçerik:</label>
             <textarea name="content" id="content" required></textarea>
           </div>
           
@@ -76,8 +76,7 @@
             <label for="post-media-upload" class="media-upload-btn">
               <i class="fas fa-image"></i> Resim/Gif Ekle
             </label>
-            <br><hr>
-            <div id="post-media-preview" class="link-preview">Gönderi Bu Şekilde Görünecek</div>
+            <div id="post-media-preview"></div>
           </div>
           
           <button type="submit" class="submit-btn">Gönder</button>
@@ -419,15 +418,6 @@
     .remove-file:hover {
         color: #ff0000;
     }
-
-    .rumble, .youtube {
-      margin: 10px 0;
-      width: 100%;
-      max-width: 640px;
-      aspect-ratio: 16/9;
-      border: none;
-  }
-  
 </style>
 
 <script>
@@ -524,43 +514,6 @@ function validatePostForm() {
 
     return true;
 }
-
-document.addEventListener('DOMContentLoaded', function () {
-  const content = document.querySelector('.post-details-content');
-  const modalContent = document.getElementById('content'); // Post creation modal text area
-
-  if (content) {
-      transformLinksToEmbeds(content);
-  }
-
-  if (modalContent) {
-      modalContent.addEventListener('input', function () {
-          const preview = document.getElementById('post-media-preview');
-          transformLinksToEmbeds(preview, modalContent.value);
-      });
-  }
-});
-
-function transformLinksToEmbeds(element, content = null) {
-  const regexRumble = /https:\/\/rumble\.com\/embed\/[^\s]+/g;
-  const regexYouTube = /(https?:\/\/(?:www\.)?youtube\.com\/watch\?v=[^\s]+|https?:\/\/youtu\.be\/[^\s]+)/g;
-
-  const text = content || element.innerHTML;
-
-  const transformedText = text
-      .replace(regexRumble, function (match) {
-          return `<iframe class="rumble" style="width: 100%; aspect-ratio: 16/9;" src="${match}" frameborder="0" allowfullscreen></iframe>`;
-      })
-      .replace(regexYouTube, function (match) {
-          const videoId = match.includes('youtu.be')
-              ? match.split('/').pop()
-              : new URL(match).searchParams.get('v');
-          return `<iframe class="youtube" style="width: 100%; aspect-ratio: 16/9;" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
-      });
-
-  element.innerHTML = transformedText;
-}
-
 </script>
 
 {% endblock %}

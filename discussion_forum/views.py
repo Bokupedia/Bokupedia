@@ -119,9 +119,8 @@ def category_topics(request, category_id):
     topics = category.topics.all().order_by('title')
     direct_posts = Post.objects.filter(category=category, topic__isnull=True).order_by('-created_at')
     
-    paginator = Paginator(direct_posts, 5)  
+    paginator = Paginator(direct_posts, 6)  
     page = request.GET.get('page', 1)
-
     try:
         paginated_posts = paginator.page(page)
     except PageNotAnInteger:
@@ -132,7 +131,7 @@ def category_topics(request, category_id):
     return render(request, 'discussion_forum/category_topics.html', {
         'category': category,
         'topics': topics,
-        'direct_posts': paginated_posts, 
+        'direct_posts': paginated_posts,
     })
 
 @login_required
