@@ -138,360 +138,395 @@
 </main>
 
 <style>
+  /* Cross-browser compatible CSS */
+.forum-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-auto-rows: max-content;
+  gap: 20px;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 1em;
+}
+
+.users-sidebar {
+  background-color: #121212;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  min-height: auto; /* Fallback */
+  height: fit-content; /* Modern browsers */
+  height: -moz-fit-content; /* Firefox */
+  height: -webkit-fit-content; /* Webkit-based browsers */
+}
+
+.latest-posts {
+  width: 700px;
+  max-width: 1200px;
+  padding: 20px;
+  background-color: #121212;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
+}
+
+.users-container {
+  background-color: #121212;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
+  min-height: auto; /* Fallback */
+  height: fit-content; /* Modern browsers */
+  height: -moz-fit-content; /* Firefox */
+  height: -webkit-fit-content; /* Webkit-based browsers */
+}
+
+.users-container h2 {
+  color: #cab7b7;
+  border-bottom: 2px solid #5e0000;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.search-container {
+  margin-bottom: 15px;
+}
+
+.search-container input {
+  width: max-content;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #2d2d2d;
+  border: 1px solid #3d3d3d;
+  color: #fff;
+}
+
+.users-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.user-item {
+  background-color: rgb(27, 27, 27);
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 8px;
+  transition: background-color 0.3s;
+}
+
+.user-item:hover {
+  background-color: #2d2d2d;
+}
+
+.username {
+  color: #b1b1b1;
+  font-size: 14px;
+}
+
+.users-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.users-list::-webkit-scrollbar-track {
+  background: #1b1b1b;
+  border-radius: 4px;
+}
+
+.users-list::-webkit-scrollbar-thumb {
+  background: #5e0000;
+  border-radius: 4px;
+}
+
+.users-list::-webkit-scrollbar-thumb:hover {
+  background: #7a0000;
+}
+
+@media (max-width: 1024px) {
   .forum-container {
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
-    grid-auto-rows: max-content;
-    gap: 20px;
-    max-width: 1500px;
-    margin: 0 auto;
-    padding: 1em;
+    grid-template-columns: 1fr;
+    gap: 15px;
   }
 
   .users-sidebar {
-    background-color: #121212;
-    padding: 20px;
-    border-radius: 8px;
-    height: max-content;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: static;
   }
+}
 
-  .latest-posts {
-    width: 700px;
-    max-width: 1200px;
-    padding: 20px;
-    background-color: #121212;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
-  }
+.latest-posts h2 {
+  color: #cab7b7;
+  border-bottom: 2px solid #5e0000;
+  padding-bottom: 10px;
+}
 
-  .users-container {
-    background-color: #121212;
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
-    max-height: max-content;
- }
+.latest-posts ul {
+  list-style-type: none;
+  padding: 0;
+}
 
-  .users-container h2 {
-    color: #cab7b7;
-    border-bottom: 2px solid #5e0000;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-  }
+.latest-posts li {
+  background-color: rgb(27, 27, 27);
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
 
-  .search-container {
-    margin-bottom: 15px;
-  }
+.latest-posts a {
+  color: #b1b1b1;
+  text-decoration: none;
+}
 
-  .search-container input {
-    width: max-content;
-    padding: 8px;
-    border-radius: 4px;
-    background-color: #2d2d2d;
-    border: 1px solid #3d3d3d;
-    color: #fff;
-  }
+.latest-posts small {
+  color: #6c757d;
+}
 
-  .users-list {
-    max-height: 500px;
-    overflow-y: auto;
-  }
+.pagination {
+  margin: 20px 0;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
 
-  .user-item {
-    background-color: rgb(27, 27, 27);
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 8px;
-    transition: background-color 0.3s;
-  }
+.pagination a, .pagination span {
+  color: #c0c0c0;
+  padding: 8px 16px;
+  text-decoration: none;
+  border: 1px solid #2d2d2d;
+  border-radius: 4px;
+  background-color: #1d1d1d;
+  transition: background-color 0.3s ease;
+}
 
-  .user-item:hover {
-    background-color: #2d2d2d;
-  }
+.pagination a:hover {
+  background-color: #2d2d2d;
+  color: #c70101;
+}
 
-  .username {
-    color: #b1b1b1;
-    font-size: 14px;
-  }
+.pagination .current-page {
+  background-color: #5e0000;
+  color: white;
+  border-color: #5e0000;
+}
 
-  .users-list::-webkit-scrollbar {
-    width: 8px;
-  }
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
 
-  .users-list::-webkit-scrollbar-track {
-    background: #1b1b1b;
-    border-radius: 4px;
-  }
+.new-post-btn {
+  background-color: #5e0000;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
 
-  .users-list::-webkit-scrollbar-thumb {
-    background: #5e0000;
-    border-radius: 4px;
-  }
+.new-post-btn:hover {
+  background-color: #7a0000;
+}
 
-  .users-list::-webkit-scrollbar-thumb:hover {
-    background: #7a0000;
-  }
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+}
 
-  @media (max-width: 1024px) {
-    .forum-container {
-      grid-template-columns: 1fr;
-      gap: 15px;
-    }
+.modal-content {
+  background-color: #1b1b1b;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+}
 
-    .users-sidebar {
-      position: static;
-    }
-  }
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-  .latest-posts h2 {
-    color: #cab7b7;
-    border-bottom: 2px solid #5e0000;
-    padding-bottom: 10px;
-  }
+.close:hover {
+  color: #fff;
+}
 
-  .latest-posts ul {
-    list-style-type: none;
-    padding: 0;
-  }
+.post-form .form-group {
+  margin-bottom: 15px;
+}
 
-  .latest-posts li {
-    background-color: rgb(27, 27, 27);
-    border-radius: 5px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
+.post-form label {
+  display: block;
+  margin-bottom: 5px;
+  color: #cab7b7;
+}
 
-  .latest-posts a {
-    color: #b1b1b1;
-    text-decoration: none;
-  }
+.post-form select,
+.post-form textarea {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #2d2d2d;
+  border: 1px solid #3d3d3d;
+  color: #fff;
+}
 
-  .latest-posts small {
-    color: #6c757d;
-  }
+.post-form .submit-btn {
+  background-color: #5e0000;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
 
-  .pagination {
-    margin: 20px 0;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
+.post-form .submit-btn:hover {
+  background-color: #7a0000;
+}
 
-  .pagination a, .pagination span {
-    color: #c0c0c0;
-    padding: 8px 16px;
-    text-decoration: none;
-    border: 1px solid #2d2d2d;
-    border-radius: 4px;
-    background-color: #1d1d1d;
-    transition: background-color 0.3s ease;
-  }
+.media-upload {
+  margin-bottom: 15px;
+}
 
-  .pagination a:hover {
-    background-color: #2d2d2d;
-    color: #c70101;
-  }
+.media-upload-btn {
+  padding: 8px 15px;
+  background-color: #444;
+  color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s, transform 0.3s;
+}
 
-  .pagination .current-page {
-    background-color: #5e0000;
-    color: white;
-    border-color: #5e0000;
-  }
+.media-upload-btn:hover {
+  background-color: #555;
+  transform: scale(1.05);
+}
 
-  .header-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #333;
+  padding: 6px 12px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
 
-  .new-post-btn {
-    background-color: #5e0000;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
+.file-name {
+  color: #fff;
+  font-size: 14px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-  .new-post-btn:hover {
-    background-color: #7a0000;
-  }
+.remove-file {
+  background: none;
+  border: none;
+  color: #ff4444;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+}
 
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.7);
-  }
+.remove-file:hover {
+  color: #ff0000;
+}
 
-  .modal-content {
-    background-color: #1b1b1b;
-    margin: 10% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 600px;
-  }
+.stats-container {
+  background-color: #121212;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
+  min-height: auto; /* Fallback */
+  height: fit-content; /* Modern browsers */
+  height: -moz-fit-content; /* Firefox */
+  height: -webkit-fit-content; /* Webkit-based browsers */
+}
 
-  .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-  }
+.stats-container h2 {
+  color: #cab7b7;
+  border-bottom: 2px solid #5e0000;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
 
-  .close:hover {
-    color: #fff;
-  }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
 
-  .post-form .form-group {
-    margin-bottom: 15px;
-  }
+.stat-item {
+  background-color: #1b1b1b;
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
 
-  .post-form label {
-    display: block;
-    margin-bottom: 5px;
-    color: #cab7b7;
-  }
+.stat-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
 
-  .post-form select,
-  .post-form textarea {
-    width: 100%;
-    padding: 8px;
-    border-radius: 4px;
-    background-color: #2d2d2d;
-    border: 1px solid #3d3d3d;
-    color: #fff;
-  }
+.stat-item h4 {
+  color: #cab7b7;
+  margin-bottom: 8px;
+}
 
-  .post-form .submit-btn {
-    background-color: #5e0000;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-  }
+.stat-item p {
+  color: #fff;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+/* For Webkit browsers like Chrome, Safari, etc. */
+.users-list::-webkit-scrollbar {
+  width: 8px;
+}
 
-  .post-form .submit-btn:hover {
-    background-color: #7a0000;
-  }
+.users-list::-webkit-scrollbar-track {
+  background: #1b1b1b;
+  border-radius: 4px;
+}
 
-      /* Media Upload Styles */
-    .media-upload {
-        margin-bottom: 15px;
-    }
+.users-list::-webkit-scrollbar-thumb {
+  background: #5e0000;
+  border-radius: 4px;
+}
 
-    .media-upload-btn {
-        padding: 8px 15px;
-        background-color: #444;
-        color: #fff;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: background-color 0.3s, transform 0.3s;
-    }
+.users-list::-webkit-scrollbar-thumb:hover {
+  background: #7a0000;
+}
 
-    .media-upload-btn:hover {
-        background-color: #555;
-        transform: scale(1.05);
-    }
+/* For Firefox */
+.users-list {
+  scrollbar-color: #5e0000 #1b1b1b; /* thumb color, track color */
+}
 
-    .file-info {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background-color: #333;
-        padding: 6px 12px;
-        border-radius: 4px;
-        margin-top: 10px;
-    }
+/* Optional: If you want to add a hover effect for Firefox too */
+.users-list:hover {
+  scrollbar-color: #7a0000 #1b1b1b; /* thumb color on hover, track color */
+}
 
-    .file-name {
-        color: #fff;
-        font-size: 14px;
-        max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .remove-file {
-        background: none;
-        border: none;
-        color: #ff4444;
-        font-size: 18px;
-        cursor: pointer;
-        padding: 0 4px;
-    }
-
-    .remove-file:hover {
-        color: #ff0000;
-    }
-
-    /* Stats */
-
-    .stats-container {
-      background-color: #121212;
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
-      max-height: max-content;
-    }
-    
-    .stats-container h2 {
-      color: #cab7b7;
-      border-bottom: 2px solid #5e0000;
-      padding-bottom: 10px;
-      margin-bottom: 15px;
-    }
-    
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-    }
-    
-    .stat-item {
-      background-color: #1b1b1b;
-      border-radius: 8px;
-      padding: 15px;
-      text-align: center;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    
-    .stat-item:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
-    }
-    
-    .stat-item h4 {
-      color: #cab7b7;
-      margin-bottom: 8px;
-    }
-    
-    .stat-item p {
-      color: #fff;
-      font-size: 1.2em;
-      font-weight: bold;
-    }
-    
 </style>
 
 <script>
