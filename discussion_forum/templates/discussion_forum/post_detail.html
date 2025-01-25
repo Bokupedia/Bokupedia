@@ -258,7 +258,9 @@
                     <span>{{ comment.created_at }}</span>
                 </div>
                 <div class="comment-body">
-                    <p>{{ comment.content|safe }}</p>
+                    <p>
+                        {{ comment.content|safe|urlize }}
+                    </p>
                     {% if comment.media_data %}
                         <img src="data:{{ comment.media_type }};base64,{{ comment.media_data }}" 
                             alt="Comment media" 
@@ -291,6 +293,7 @@
     {% else %}
         <h4>Henüz yorum yapılmamış.</h4>
     {% endif %}
+    
 
     <!-- Yorum Formu -->
     <form method="post" class="comment-form" enctype="multipart/form-data" onsubmit="return validateForm()">
@@ -415,6 +418,14 @@
         font-size: 14px;
         margin-top: 5px;
         color: #dddddd;
+    }
+
+    .comment-body a {
+        color: white;
+        text-decoration: none;
+    }
+    .comment-body a:hover {
+        text-decoration: underline;
     }
 
     /* Yorum Formu */
