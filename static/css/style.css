@@ -39,7 +39,7 @@
     margin: 0;
     padding: 0;
     width: 100%;
-    overflow-x: hidden;
+    overflow-x: hidden !important;
     display: grid;
     grid-template-rows: auto 1fr auto;
     grid-template-areas: 
@@ -72,6 +72,7 @@
     display: grid;
     grid-template-columns: 1fr 2fr;
     max-width: 100%;
+    overflow-x: hidden !important;
     overflow: hidden;
     -ms-grid-areas: "sidebar content";
     grid-template-areas: "sidebar content";
@@ -88,6 +89,7 @@
     position: relative;
     -webkit-align-items: center;
     -ms-flex-align: center;
+    overflow-x: hidden !important;
     padding: 0 20px;
     flex-wrap: wrap;
     max-width: 100%; 
@@ -185,7 +187,8 @@
     padding: 0;
     min-width: 100px;
     max-width: 100%;
-  overflow: hidden;
+    overflow-x: hidden !important;
+    overflow: hidden;
   }
 
   .auth-menu ul {
@@ -266,6 +269,7 @@
     padding: 1em 0;
     border-top: 1px solid #333;
     font-size: 0.9em;
+    overflow-x: hidden !important;
     width: 100%;
     margin-top: auto;
   }

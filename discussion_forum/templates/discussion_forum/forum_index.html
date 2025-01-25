@@ -146,7 +146,8 @@
   gap: 20px;
   max-width: 1500px;
   margin: 0 auto;
-  padding: 1em;
+  padding: 0;
+  overflow-x: hidden !important;
 }
 
 .users-sidebar {
@@ -245,7 +246,6 @@
     grid-template-columns: 1fr;
     gap: 15px;
   }
-
   .users-sidebar {
     position: static;
   }
@@ -554,27 +554,26 @@
 
   window.onclick = function(event) {
     const modal = document.getElementById('postModal');
-    if (event.target == modal) {
-      modal.style.display = 'none';
+    if (event.target === modal) {
+      closePostModal();
     }
-  }
-
+  };
+  
+  let debounceTimeout;
   function searchUsers() {
     const input = document.getElementById('searchInput');
-    if (!input) return;
-
     const filter = input.value.toLowerCase();
     const users = document.querySelectorAll('.user-item');
 
-    users.forEach(user => {
-      const username = user.getAttribute('data-username');
-      if (username.indexOf(filter) > -1) {
-        user.style.display = '';
-      } else {
-        user.style.display = 'none';
-      }
-    });
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+      users.forEach(user => {
+        const username = user.getAttribute('data-username');
+        user.style.display = username.includes(filter) ? '' : 'none';
+      });
+    }, 300);
   }
+
 
   document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('post-media-upload');
