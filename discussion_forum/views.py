@@ -89,6 +89,12 @@ def get_topics(request, category_id):
     topics = Topic.objects.filter(category_id=category_id).values('id', 'title')
     return JsonResponse({'topics': list(topics)})
 
+def update_user_activity(request):
+    if request.user.is_authenticated:
+        request.session['last_activity'] = timezone.now()
+        request.user.last_activity = timezone.now()
+        request.user.save()
+
 @login_required
 def forum_index(request):
     categories = Category.objects.prefetch_related('topics').all()
@@ -110,7 +116,7 @@ def forum_index(request):
     active_sessions = Session.objects.filter(expire_date__gte=timezone.now()).count()
 
     # Son 15 dakikada aktif olan kullanıcılar
-    active_time_threshold = timezone.now() - timedelta(minutes=15)
+    active_time_threshold = timezone.now() - timedelta(minutes=2)
     active_users = User.objects.filter(last_login__gte=active_time_threshold)
 
     active_users_count = active_users.count()
