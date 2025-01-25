@@ -8,6 +8,9 @@ from .models import Topic, Category, Post
 from django.db.models.functions import Lower
 from user_accounts.models import User
 from notifications.models import Notification
+from django.contrib.sessions.models import Session
+from django.utils import timezone
+from datetime import timedelta
 from post_interactions.models import (
     Comment,
     Haha,
@@ -100,6 +103,21 @@ def forum_index(request):
     paginator = Paginator(all_posts, 10)
     page = request.GET.get('page', 1)
 
+    total_users = User.objects.count()
+    total_posts = Post.objects.count()
+    total_categories = Category.objects.count()
+    
+    active_sessions = Session.objects.filter(expire_date__gte=timezone.now()).count()
+
+    # Son 15 dakikada aktif olan kullanıcılar
+    active_time_threshold = timezone.now() - timedelta(minutes=15)
+    active_users = User.objects.filter(last_login__gte=active_time_threshold)
+
+    active_users_count = active_users.count()
+
+    active_users_names = [user.username for user in active_users]
+    active_users_count = len(active_users_names)
+
     try:
         latest_posts = paginator.page(page)
     except PageNotAnInteger:
@@ -111,7 +129,13 @@ def forum_index(request):
         'categories': categories,
         'latest_posts': latest_posts,
         'users': all_users,
-    })
+        'stats': {
+            'total_users': total_users,
+            'total_posts': total_posts,
+            'total_categories': total_categories,
+            'active_users': ', '.join(active_users_names)
+        }
+})
 
 @login_required
 def category_topics(request, category_id):
