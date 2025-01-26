@@ -8,10 +8,10 @@
 __pycache__/
 local_settings.py
 
-CyberHex\settings.py
+#CyberHex\settings.py
 
-db.sqlite3
-db.sqlite3-journal
+#db.sqlite3
+#db.sqlite3-journal
 media
 
 # If your build process includes running collectstatic, then you probably don't need or want to include staticfiles/
