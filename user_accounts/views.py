@@ -36,8 +36,24 @@ def profile_posts(request, username):
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
-        print(form)
         if form.is_valid():
+            username = form.cleaned_data['username']
+            forbidden_usernames = ['admin', 'moderator', 'root', 'system', 'administrator']
+            
+            if username.lower() in forbidden_usernames:
+                form.add_error('username', 'Bu kullanıcı adı kullanılamaz.')
+                return render(request, 'registration/register.html', {'form': form})
+            
+            forbidden_words = ['admin', 'mod', 'allah', '4ll4h', 'atatürk', 'rte', 'akp', 'chp', 'mhp', 'terorist', 'terörist', 'ataturk', 'kuran', 'bokupedia', 'bokupediya', 'bokupedya', 'raptor', 'öyy', 'mordor']
+            
+            cleaned_username = ''.join(char.lower() if char.isalnum() else ' ' for char in username)
+            username_parts = cleaned_username.split()
+            
+            # Her bir kelime parçasını kontrol et
+            if any(forbidden in part.lower() for part in username_parts for forbidden in forbidden_words):
+                form.add_error('username', 'Kullanıcı adınız yasaklı kelimeler içeremez.')
+                return render(request, 'registration/register.html', {'form': form})
+            
             user = form.save()
             return redirect('user_accounts:profile', username=user.username)
     else:
