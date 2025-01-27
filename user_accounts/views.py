@@ -10,13 +10,17 @@ from django.contrib import messages
 def profile(request, username):
     user = get_object_or_404(User, username=username)
     profile = user
+    post_count = user.posts.count()
 
     if user == request.user:
         if not user.first_name or not user.bio:
             messages.warning(request, "Profiliniz eksik. Lütfen tamamlayın.")
     
-    return render(request, 'profile.html', {'user': user, 'profile': profile})
-
+    return render(request, 'profile.html', {
+        'user': user, 
+        'profile': profile,
+        'post_count': post_count
+    })
 @login_required
 def profile_posts(request, username):
     user = get_object_or_404(User, username=username)

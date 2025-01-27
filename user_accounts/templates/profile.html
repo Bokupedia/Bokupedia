@@ -6,18 +6,30 @@
     <div class="profile-card">
         <div class="profile-info">
             <table>
-                <tr>
-                    <td><strong>Kullanıcı adı</strong></td>
-                    <td>{{ user }}</td>
-                </tr>
-                <tr>
-                    <td><strong>İsim</strong></td>
-                    <td>{{ user.first_name|default:"Henüz belirtilmemiş" }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Biyografi</strong></td>
-                    <td class="bio-text">{{ profile.bio|default:"Henüz belirtilmemiş" }}</td>
-                </tr>
+              <tr>
+                  <td><strong>Kullanıcı adı</strong></td>
+                  <td>{{ user }}</td>
+              </tr>
+              <tr>
+                  <td><strong>İsim</strong></td>
+                  <td>{{ user.first_name|default:"Henüz belirtilmemiş" }}</td>
+              </tr>
+              <tr>
+                  <td><strong>Biyografi</strong></td>
+                  <td class="bio-text">{{ profile.bio|default:"Henüz belirtilmemiş" }}</td>
+              </tr>
+              <tr>
+                  <td><strong>Katılma Tarihi</strong></td>
+                  <td>{{ user.date_joined|date:"d F Y" }}</td>
+              </tr>
+              <tr>
+                  <td><strong>Toplam Gönderi</strong></td>
+                  <td>{{ post_count }}</td>
+              </tr>
+              <tr>
+                <td><strong>Başarımlar</strong></td>
+                <td></td>
+            </tr>
             </table>
             <a href="{% url 'user_accounts:profile_posts' username=user.username %}" class="view-posts-button">{{user.username}} Gönderileri</a>
 
