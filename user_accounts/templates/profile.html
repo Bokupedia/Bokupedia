@@ -7,9 +7,13 @@
         <div class="profile-info">
             <table>
               <tr>
-                  <td><strong>Kullanıcı adı</strong></td>
-                  <td>{{ user }}</td>
-              </tr>
+                <td><strong>Kullanıcı adı</strong></td>
+                <td>{% if user.is_staff %}
+                    <strong style="color: #45aca5;">{{ user }}</strong>
+                {% else %}
+                    <strong style="color: #cd8032;">{{ user }}</strong>
+                {% endif %}</td>
+             </tr>
               <tr>
                   <td><strong>İsim</strong></td>
                   <td>{{ user.first_name|default:"Henüz belirtilmemiş" }}</td>

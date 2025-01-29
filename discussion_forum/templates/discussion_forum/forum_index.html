@@ -23,19 +23,23 @@
     {% if user.is_authenticated %}
     <div class="header-section">
       <h2>Son Gönderiler</h2>
-      <button class="new-post-btn" onclick="openPostModal()">Yeni Gönderi</button>
+      <strong><button class="new-post-btn" onclick="openPostModal()">Yeni Gönderi</button></strong>
     </div>
     <ul>
       {% for post in latest_posts %}
       <li>
         <p>
-          <strong>{{ post.author.username }}</strong> tarafından
+          {% if post.author.is_staff %}
+              <strong style="color: #45aca5;">{{ post.author.username }}</strong> - 
+          {% else %}
+              <strong style="color: #cd8032;">{{ post.author.username }}</strong> - 
+          {% endif %}
           <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}">
-            {{ post.topic.category.name }} {{ post.topic.title }} <b><i><span style="color:#e50202;">Daha fazlası için tıkla...</span></i></b>
+            {{ post.category.name }} {{ post.topic.title }} <b><i><span style="color:#e50202;">Daha fazlası için tıkla...</span></i></b>
           </a>
         </p>
         <div>
-          {{ post.content|striptags|escape|truncatewords:7 }}
+          {{ post.content|striptags|escape|truncatewords:20 }}
         </div>
         <p><small>{{ post.created_at|date:"d M Y H:i" }}</small></p>
       </li>

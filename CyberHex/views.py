@@ -10,7 +10,7 @@ def staff(request):
     return render(request, 'staff.html')
 
 def contents(request):
-    categories = Category.objects.all()
+    categories = Category.objects.all().order_by('name')
     return render(request, 'contents.html', {'categories': categories})
 
 def custom_403_view(request, exception):

@@ -97,7 +97,7 @@ def update_user_activity(request):
 
 @login_required
 def forum_index(request):
-    categories = Category.objects.prefetch_related('topics').all()
+    categories = Category.objects.prefetch_related('topics').all().order_by('name')
     all_posts = Post.objects.select_related('author', 'topic', 'topic__category').order_by('-created_at')
     
     all_users = User.objects.order_by(Lower('username'))
