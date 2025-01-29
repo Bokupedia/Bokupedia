@@ -10,7 +10,7 @@
         {% for post in posts %}
             <li class="profile-posts">
                     <div class="profile-post-details">
-                        <h2>Başlık: {{ post.topic.category.name }} {{post.topic}}</h2> 
+                        <h2>Başlık: {{ post.category.name }}{% if post.topic %} / {{post.topic}}{% endif %}</h2>
                         <p>İçerik: {{ post.content|striptags|escape|truncatewords:7}}</p> 
                         <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}">Gönderime git</a>
                     </div>

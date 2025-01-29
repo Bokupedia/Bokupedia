@@ -8,6 +8,7 @@ from .models import Topic, Category, Post
 from django.db.models.functions import Lower
 from user_accounts.models import User
 from notifications.models import Notification
+from django.db.models import Case, When
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 from datetime import timedelta
@@ -97,7 +98,12 @@ def update_user_activity(request):
 
 @login_required
 def forum_index(request):
-    categories = Category.objects.prefetch_related('topics').all().order_by('name')
+    categories = Category.objects.annotate(
+        custom_order=Case(
+            When(name='Gündem', then=0),
+            default=1,
+        )
+    ).order_by('custom_order', 'name')
     all_posts = Post.objects.select_related('author', 'topic', 'topic__category').order_by('-created_at')
     
     all_users = User.objects.order_by(Lower('username'))

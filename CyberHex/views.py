@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from django.db.models import Case, When
 from discussion_forum.models import Category
 
 
@@ -10,7 +10,12 @@ def staff(request):
     return render(request, 'staff.html')
 
 def contents(request):
-    categories = Category.objects.all().order_by('name')
+    categories = Category.objects.annotate(
+        custom_order=Case(
+            When(name='Gündem', then=0),
+            default=1,
+        )
+    ).order_by('custom_order', 'name')
     return render(request, 'contents.html', {'categories': categories})
 
 def custom_403_view(request, exception):
