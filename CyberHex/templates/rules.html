@@ -1,0 +1,105 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block content %}
+<main class="rules-container">
+   <div class="rules-card">
+      <h2>Forum Kuralları ve Yasaklar</h2>
+
+      <h3>1. Saygılı ve Nazik Olun</h3>
+      <p>Forumda tüm üyeler birbirine saygılı ve nazik davranmak zorundadır. Kişisel hakaretler, küfürlü dil, ırkçılık, cinsiyetçilik gibi ayrımcı ifadeler kesinlikle yasaktır.</p>
+
+      <h3>2. Yasalara Uyun</h3>
+      <p>Yasalara aykırı içerikler paylaşmak, başkalarının haklarını ihlal etmek veya yasa dışı faaliyetlere dair içerik paylaşmak yasaktır.</p>
+
+      <h3>3. Spam ve Reklam Yapmayın</h3>
+      <p>Forumda spam mesajlar (aynı mesajı tekrarlama), aldatıcı reklamlar veya kişisel çıkar sağlamak amacıyla yapılan herhangi bir reklam yasaktır.</p>
+
+      <h3>4. Başlık ve İçerik Uygunluğu</h3>
+      <p>Başlıklar ve içerikler forumun genel amacına uygun olmalıdır. Yanıltıcı başlıklar, spam içerikler veya alakasız konular açmak yasaktır.</p>
+
+      <h3>5. Paylaşımda Dikkatli Olun</h3>
+      <p>Kişisel bilgilerinizi (ad, soyad, adres, telefon numarası vb.) ve başkalarının kişisel bilgilerini ifşa etmek yasaktır. Telif hakkı ihlali yapmaktan kaçının. Başka kaynaklardan alınan görsel, video ve metinleri, uygun izinlerle veya kaynak göstererek paylaşın.</p>
+
+      <h3>6. Provokasyon ve Kavga</h3>
+      <p>Forumda kışkırtıcı, provokatif ve bölücü dil kullanmak yasaktır. Amacımız, her kullanıcının fikirlerini özgürce ifade edebileceği, yapıcı tartışmaların gerçekleştiği bir ortam oluşturmaktır.</p>
+
+      <h3>7. Hesap Paylaşımı ve Çoğaltma</h3>
+      <p>Birden fazla hesap açmak veya başkalarının hesaplarını ele geçirmek yasaktır. Her üye sadece tek bir hesapla katılabilir.</p>
+
+      <h3>8. Moderatör Kararlarına Saygı Gösterin</h3>
+      <p>Moderatörlerin aldığı kararlar ve yönlendirmelere saygı göstermek zorundasınız. Moderatörler, forumun düzenini sağlamak için gerekli müdahaleleri yapabilir.</p>
+
+      <h3>9. Dil ve İçerik Seçimi</h3>
+      <p>Forumda kullanılan dil Türkçe olmalıdır. Ancak, Türkçe dışında başka bir dilde de anlaşılabilir şekilde paylaşımlar yapılabilir.</p>
+
+      <h3>10. Yasaklı İçerikler</h3>
+      <p>Nefret söylemi, cinsel içerik, şiddet içeren dil veya uyuşturucu kullanımı gibi içerikler kesinlikle yasaktır.</p>
+
+      <h3>11. Hileli veya Yanıltıcı Yöntemler</h3>
+      <p>Yazılım, sistem veya forumun güvenliğini tehlikeye atacak hileli yöntemler, sistem açıkları kullanmak veya üyeleri yanıltmak yasaktır.</p>
+
+      <hr>
+
+      <p>Kurallara uymayan davranışlar ve forumda yapılacak ihlaller durumunda, kullanıcılara çeşitli yaptırımlar uygulanabilir. Bu yaptırımlar, forumdan geçici veya kalıcı olarak uzaklaştırma, içerik silme ve/veya uyarı verme şeklinde olabilir.</p>
+
+      <p>Herkese keyifli ve saygılı bir forum deneyimi dileriz!</p>
+   </div>
+</main>
+
+<style>
+.rules-container {
+    display: flex;
+    justify-content: center;
+    padding: 3em 0;
+}
+
+.rules-card {
+    background-color: rgba(0, 0, 0, 0.7);  /* Opaklık daha koyu */
+    color: #fff;
+    padding: 2.5em;
+    border-radius: 10px;
+    width: 60%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    text-align: left;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.rules-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+}
+
+.rules-card h2 {
+    color:#b40000;
+    font-size: 2em;
+    text-align: center;
+    margin-bottom: 1.5em;
+}
+
+.rules-card h3 {
+    color: #b40000;
+    font-size: 1.4em;
+    margin-bottom: 0.5em;
+    font-weight: bold;
+}
+
+.rules-card p {
+    color: #ccc;
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-bottom: 1em;
+}
+
+.rules-card p:last-child {
+    margin-bottom: 0;
+}
+
+@media screen and (max-width: 768px) {
+    .rules-card {
+        width: 90%;
+        padding: 1.5em;
+    }
+}
+</style>
+
+{% endblock %}

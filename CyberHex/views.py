@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.db.models import Case, When
 from discussion_forum.models import Category
 
+def rules(request):
+    return render(request, 'rules.html')  
 
 def mission(request):
     return render(request, 'mission.html')  

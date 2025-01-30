@@ -12,6 +12,7 @@ urlpatterns = [
     path('interactions/', include('post_interactions.urls')),
     path('notifications/', include('notifications.urls')),
     path('mission', views.mission, name='mission'),
+    path('rules', views.rules, name='rules'),
     path('staff', views.staff, name='staff'),
     path('contents', views.contents, name='contents'),
     path('ckeditor5/', include('django_ckeditor_5.urls')),
