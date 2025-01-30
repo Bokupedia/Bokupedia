@@ -32,25 +32,27 @@
     <ul>
       {% for post in latest_posts %}
       <li>
-        <p>
-          {% if post.author.is_staff %}
-              <strong style="color: #45aca5;">{{ post.author.username }}</strong> - 
-          {% else %}
-              <strong style="color: #cd8032;">{{ post.author.username }}</strong> - 
-          {% endif %}
-          <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}">
-            {{ post.category.name }} {{ post.topic.title }} <b><i><span style="color:#e50202;">Daha fazlası için tıkla...</span></i></b>
-          </a>
-        </p>
-        <div>
-          {{ post.content|striptags|escape|truncatewords:20 }}
-        </div>
-        <p><small>{{ post.created_at|date:"d M Y H:i" }}</small></p>
+          <p>
+              <strong style="color: brown">{{ post.author.username }}</strong> - 
+              <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}">
+                  {{ post.category.name }} {{ post.topic.title }} 
+              </a>
+              <span style="float: right;">
+                  <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}" style="color:#e50202; font-weight: bold;">
+                      Daha fazlası için tıkla...
+                  </a>
+              </span>
+          </p>
+          <div>
+              {{ post.content|striptags|escape|truncatewords:20 }}
+          </div>
+          <p><small>{{ post.created_at|date:"d M Y H:i" }}</small></p>
       </li>
       {% empty %}
       <li>Herhangi bir gönderi yok.</li>
       {% endfor %}
     </ul>
+  
 
     <!-- Post Modal -->
     <div id="postModal" class="modal">

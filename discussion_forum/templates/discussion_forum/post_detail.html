@@ -103,11 +103,13 @@
     <h2 class="post-details-topic-header">{{ post.title }}</h2>
     <div class="post-details-post-header">
         <div class="post-author-section">
-            <h2>Yazar: {% if post.author.is_staff %}
-                <strong style="color: #45aca5;">{{ post.author }}</strong>
-            {% else %}
-                <strong style="color: #cd8032;">{{ post.author }}</strong>
-            {% endif %}</h2>
+            <h2>
+                Yazar:
+                <a href="/accounts/profile/{{ post.author.username }}">
+                    <u style="color: brown"><strong style="color: brown">{{ post.author }}</strong></u>
+                </a>
+            </h2>
+            
             {% if post.author == request.user or request.user.is_staff %}
                 <div class="post-actions">
                     <button class="edit-post-btn" onclick="showPostEditForm()">Gönderiyi Düzenle</button>

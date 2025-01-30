@@ -4,13 +4,33 @@
 <main class="mission-container">
    <div class="mission-card">
       <img src="{% static 'images/bandofhawk.jpeg' %}" alt="Band of Hawk" />
-      <h2>Bok of 35 Discord temelli bir eğlence kuruluşudur. 04/12/2022 tarihinde Yiğit Anıl Tırpancı tarafından kurulmuştur. Eğlencenin merkezi olan sunucumuzda kapımız herkese açıktır, hiç kimseye din, dil, ırk, yaş fark etmeksizin eşit şekilde yaklaşılır ve saygı gösterilir. (şüpheli)</h2>
-      <h2>Hayattan zevk almıyor musunuz? En son yüzünüz güleli haftalar hatta aylar mı oldu? İnternet etmeye mi meyillisiniz? Sorun değil, Bok of 35 burada!</h2>
-      <h2>Bok of 35 boş zamanlarınızda arkadaşlarınızla vakit geçirebileceğiniz, yeni arkadaşlıklar kurup sosyal çevrenizi genişletebileceğiniz harika bir sunucu! Her gün dönen harika contentler, dünyaca ünlü şaklabanlar, (ÖYY) her gün esen komedi tufanı, kahkaha şelalesi, mizah şovun yanı sıra birbirinden müthiş oyunlar oynayarak hayattan tekrardan zevk almanızı sağlamamız bizler için çocuk oyuncağı! (31 çekmekten sivilcelenen yüzünüzü güldürmek bizim işimiz!)</h2>
+      
+      <h1>Bokupedia</h1>
+      <h2>İnternetin göt deliğine hoş geldiniz! </h2>
+      <h2>Bokupedia, 31/12/2024 tarihinde temelleri Raptor tarafından atılmış,
+         12/01/2025'te hayata geçmiş bir forumdur.</h2>
+      
+
+      <h1>Band of 35</h1>
+      <h2>Band of 35, Discord temelli bir eğlence kuruluşudur. 04/12/2022 tarihinde Yiğit Anıl Tırpancı tarafından kurulmuştur. 
+        Eğlencenin merkezi olan sunucumuzda kapımız herkese kapalıdır,
+         hiç kimseye din, dil, ırk, yaş fark etmeksizin eşit şekilde yaklaşılmaz ve saygı gösterilmez.</h2>
+      
+      <h1>Bokupedia'da Neler Var?</h1>
+      <ul>
+         <li>Demode ve komik olmayan içerikler</li>
+         <li>Topluluk tarafından oluşturulan memeler, şakalar ve absürt tartışmalar</li>
+         <li>Band of 35’in eğlencesiz ruhunu yaşatan etkinlikler</li>
+         <li>Sansürlü, mahkum ve samimi olmayan bir topluluk</li>
+         <li>Arkadaşlıklar kurup internetin en neşesiz insanlarıyla tanışma fırsatı</li>
+         <li>Hayatınızın en kötü deneyimi.</li>
+      </ul>
+      
+      <h2>İnternet mi etmek istiyosun? Bokupedia’ya gel, yardımcı olalım! 🤣🤣🤣🫵🏼🫵🏼🫵🏼</h2>
    </div>
 </main>
+
 <style>
-   
 .mission-container {
     display: flex;
     justify-content: center;
@@ -18,7 +38,7 @@
 }
 
 .mission-card {
-    background-color: rgba(0, 0, 0, 0.6);  /* sondaki opaklık değeri */
+    background-color: rgba(0, 0, 0, 0.6);
     color: #fff;
     padding: 2.5em;
     border-radius: 10px;
@@ -41,15 +61,29 @@
     border: 3px solid #444;
 }
 
+.mission-card h1 {
+    color: #b40000;
+    font-size: 1.5em;
+    margin-bottom: 0.5em;
+}
+
 .mission-card h2 {
     color: #ddd;
     font-size: 1.1em;
     line-height: 1.6;
+    margin-bottom: 1em;
+}
+
+.mission-card ul {
+    list-style-type: square;
+    padding-left: 20px;
     margin-bottom: 1.5em;
 }
 
-.mission-card h2:last-child {
-    margin-bottom: 0;
+.mission-card ul li {
+    color: #ddd;
+    font-size: 1.1em;
+    margin-bottom: 0.5em;
 }
 
 @media screen and (max-width: 768px) {

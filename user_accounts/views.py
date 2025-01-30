@@ -49,7 +49,6 @@ def register(request):
             cleaned_username = ''.join(char.lower() if char.isalnum() else ' ' for char in username)
             username_parts = cleaned_username.split()
             
-            # Her bir kelime parçasını kontrol et
             if any(forbidden in part.lower() for part in username_parts for forbidden in forbidden_words):
                 form.add_error('username', 'Kullanıcı adınız yasaklı kelimeler içeremez.')
                 return render(request, 'registration/register.html', {'form': form})

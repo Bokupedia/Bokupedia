@@ -148,7 +148,7 @@
         <p class="topic-post-content">{{ post.content|striptags|escape|truncatewords:10 }}</p>
 
         <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}">
-        <b><i><span style="color:#e50202;" class="red-underlined">Daha fazlası için tıkla...</span></i></b>
+        <b><span style="color:#e50202;" class="red-underlined">Daha fazlası için tıkla...</span></b>
         
         </a>
       </li>
