@@ -33,7 +33,7 @@
       {% for post in latest_posts %}
       <li>
           <p>
-              <strong style="color: brown">{{ post.author.username }}</strong> - 
+              <strong style="color:hsla(79, 100.00%, 50.00%, 0.80)">{{ post.author.username }}</strong> - 
               <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}">
                   {{ post.category.name }} {{ post.topic.title }} 
               </a>
