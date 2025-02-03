@@ -24,6 +24,14 @@ class CustomLoginForm(AuthenticationForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
 class ProfileUpdateForm(forms.ModelForm):
+    bio = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'rows': 8,
+            'maxlength': 500,
+            'class': 'bio-textarea'
+        })
+    )
+    
     class Meta:
         model = User
-        fields = ['first_name', 'bio',]
+        fields = ['first_name', 'bio']

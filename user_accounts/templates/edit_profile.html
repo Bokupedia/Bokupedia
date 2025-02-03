@@ -8,9 +8,10 @@
             <label for="id_first_name">Ad:</label>
             {{ form.first_name }}
         </div>
-        <div class="form-group">
-            <label for="id_bio">Biyografi:</label>
-            {{ form.bio }}
+        <div class="form-group bio-group">
+          <label for="id_bio">Biyografi:</label>
+          {{ form.bio }}
+          <div class="bio-counter"><span id="current">0</span>/500 karakter</div>
         </div>
         <button type="submit" class="save-button">Kaydet</button>
     </form>
@@ -127,5 +128,64 @@ form input[type="file"] {
     padding: 0.7em 1.2em;
   }
 }
+
+.bio-group {
+  position: relative;
+  margin-bottom: 2em;
+}
+
+.bio-group textarea {
+  min-height: 200px !important;
+  font-size: 1.1em !important;
+  line-height: 1.6 !important;
+  padding: 1.2em !important;
+  background-color: #1e1e1e !important;
+  color: #e0e0e0 !important;
+  border: 2px solid #444 !important;
+  border-radius: 8px !important;
+  resize: vertical !important;
+  width: 100% !important;
+  transition: all 0.3s ease !important;
+}
+
+.bio-group textarea:focus {
+  border-color: #910000 !important;
+  box-shadow: 0 0 12px rgba(145, 0, 0, 0.3) !important;
+  background-color: #252525 !important;
+}
+
+.bio-counter {
+  position: absolute;
+  bottom: -25px;
+  right: 10px;
+  color: #888;
+  font-size: 0.9em;
+}
+
+/* Karakter limiti yaklaştığında kırmızı gösterme */
+.bio-counter.near-limit {
+  color: #ff4444;
+}
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const bioTextarea = document.querySelector('#id_bio');
+      const counter = document.querySelector('.bio-counter span');
+      
+      function updateCounter() {
+          const currentLength = bioTextarea.value.length;
+          counter.textContent = currentLength;
+          
+          if (currentLength > 450) {
+              document.querySelector('.bio-counter').classList.add('near-limit');
+          } else {
+              document.querySelector('.bio-counter').classList.remove('near-limit');
+          }
+      }
+      
+      bioTextarea.addEventListener('input', updateCounter);
+      updateCounter();
+  });
+</script>
 {% endblock %}
