@@ -97,6 +97,41 @@
         const content = editor.getData();
         document.getElementById('edited-content').value = content;
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const editFileInput = document.getElementById('edit-media-upload');
+        const editPreviewDiv = document.getElementById('edit-media-preview');
+        
+        editFileInput.addEventListener('change', function(e) {
+            const file = this.files[0];
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Dosya boyutu 5MB\'dan küçük olmalıdır');
+                this.value = '';
+                editPreviewDiv.innerHTML = '';
+                return;
+            }
+            
+            editPreviewDiv.innerHTML = `
+                <div class="file-info">
+                    <i class="fas fa-image"></i>
+                    <span class="file-name">${file.name}</span>
+                    <button type="button" class="remove-file">×</button>
+                </div>`;
+            
+            const removeButton = editPreviewDiv.querySelector('.remove-file');
+            removeButton.addEventListener('click', function() {
+                editFileInput.value = '';
+                editPreviewDiv.innerHTML = '';
+            });
+        });
+    });
+    
+    function removeExistingMedia() {
+        document.getElementById('remove-media').value = 'true';
+        document.getElementById('edit-media-preview').innerHTML = '';
+    }
 </script>
 
 <div class="post-details-topic">
@@ -119,10 +154,28 @@
                     </form>
                 </div>
         
-                <form method="post" id="edit-post-form" class="edit-form" style="display: none;">
+                <form method="post" id="edit-post-form" class="edit-form" style="display: none;" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div id="editor"></div>
                     <input type="hidden" name="edited_post_content" id="edited-content">
+                    
+                    <div class="media-upload">
+                        <input type="file" name="edited_media" id="edit-media-upload" accept="image/*" style="display: none;">
+                        <label for="edit-media-upload" class="media-upload-btn">
+                            <i class="fas fa-image"></i> Resim/Gif Değiştir
+                        </label>
+                        <div id="edit-media-preview">
+                            {% if post.media_data %}
+                                <div class="file-info">
+                                    <i class="fas fa-image"></i>
+                                    <span class="file-name">Mevcut medya</span>
+                                    <button type="button" class="remove-file" onclick="removeExistingMedia()">×</button>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <input type="hidden" name="remove_media" id="remove-media" value="false">
+                    
                     <div class="form-buttons">
                         <button type="submit" name="edit_post" class="submit-post-btn" onclick="saveContent()">Kaydet</button>
                         <button type="button" onclick="hidePostEditForm()" class="cancel-btn">İptal</button>
@@ -768,6 +821,16 @@
         background: #fff;
         min-weight: 500px;
         color: white;
+    }
+
+    .edit-media-preview img {
+        max-width: 200px;
+        max-height: 200px;
+        margin-top: 10px;
+    }
+    
+    #edit-media-preview .file-info {
+        margin-top: 10px;
     }
 </style>
 {% endblock %}

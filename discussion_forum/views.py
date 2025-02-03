@@ -179,6 +179,21 @@ def post_detail(request, post_id):
             if post.author == request.user or request.user.is_staff:
                 edited_content = request.POST.get('edited_post_content')
                 post.content = edited_content
+                
+                # Medya işlemleri
+                remove_media = request.POST.get('remove_media') == 'true'
+                if remove_media:
+                    post.media_data = None
+                    post.media_type = None
+                
+                if 'edited_media' in request.FILES:
+                    file = request.FILES['edited_media']
+                    if file.size > 5 * 1024 * 1024:
+                        raise ValidationError("Dosya boyutu 5MB'dan küçük olmalı")
+                    
+                    post.media_data = base64.b64encode(file.read()).decode('utf-8')
+                    post.media_type = file.content_type
+                
                 post.save()
                 return redirect('discussion_forum:post_detail', post_id=post.id)
             
