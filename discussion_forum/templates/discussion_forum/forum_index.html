@@ -536,134 +536,134 @@
 </style>
   
 <script>
-  let quill;
+    let quill;
 
-  function openPostModal() {
-    document.getElementById('postModal').style.display = 'block';
-    
-    if (!quill) {
-      quill = new Quill('#editor-container', {
-        theme: 'snow',
-        placeholder: 'İçeriğinizi yazın...',
-        modules: {
-          toolbar: [
-            ['bold', 'italic', 'underline', 'strike'],
-            [{ 'color': [] }, { 'background': [] }],
-          ]
-        }
-      });
-    }
-  }
-
-  function closePostModal() {
-    document.getElementById('postModal').style.display = 'none';
-  }
-
-  document.getElementById('category').addEventListener('change', function() {
-    const categoryId = this.value;
-    const topicSelect = document.getElementById('topic');
-    
-    fetch(`/api/topics/${categoryId}/`)
-      .then(response => response.json())
-      .then(data => {
-        topicSelect.innerHTML = '<option value="">Konu Seçin (Opsiyonel (Varsa 😉))</option>';
-        data.topics.forEach(topic => {
-          topicSelect.innerHTML += `<option value="${topic.id}">${topic.title}</option>`;
+    function openPostModal() {
+      document.getElementById('postModal').style.display = 'block';
+      
+      if (!quill) {
+        quill = new Quill('#editor-container', {
+          theme: 'snow',
+          placeholder: 'İçeriğinizi yazın...',
+          modules: {
+            toolbar: [
+              ['bold', 'italic', 'underline', 'strike'],
+              [{ 'color': [] }, { 'background': [] }],
+            ]
+          }
         });
+      }
+    }
+
+    function closePostModal() {
+      document.getElementById('postModal').style.display = 'none';
+    }
+
+    document.getElementById('category').addEventListener('change', function() {
+      const categoryId = this.value;
+      const topicSelect = document.getElementById('topic');
+      
+      fetch(`/api/topics/${categoryId}/`)
+        .then(response => response.json())
+        .then(data => {
+          topicSelect.innerHTML = '<option value="">Konu Seçin (Opsiyonel (Varsa 😉))</option>';
+          data.topics.forEach(topic => {
+            topicSelect.innerHTML += `<option value="${topic.id}">${topic.title}</option>`;
+          });
+        });
+    });
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('postModal');
+      if (event.target === modal) {
+        closePostModal();
+      }
+    };
+    
+    let debounceTimeout;
+    function searchUsers() {
+      const input = document.getElementById('searchInput');
+      const filter = input.value.toLowerCase();
+      const users = document.querySelectorAll('.user-item');
+
+      clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(() => {
+        users.forEach(user => {
+          const username = user.getAttribute('data-username');
+          user.style.display = username.includes(filter) ? '' : 'none';
+        });
+      }, 300);
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const fileInput = document.getElementById('post-media-upload');
+      const previewDiv = document.getElementById('post-media-preview');
+      
+      fileInput.addEventListener('change', function(e) {
+          const file = this.files[0];
+          if (!file) return;
+          
+          if (file.size > 5 * 1024 * 1024) {
+              alert('Dosya boyutu 5MB\'dan küçük olmalıdır');
+              this.value = '';  
+              previewDiv.innerHTML = '';  
+              return;
+          }
+          
+          previewDiv.innerHTML = `
+              <div class="file-info">
+                  <i class="fas fa-image"></i>
+                  <span class="file-name">${file.name}</span>
+                  <button type="button" class="remove-file">×</button>
+              </div>`;
+          
+          const removeButton = previewDiv.querySelector('.remove-file');
+          removeButton.addEventListener('click', function() {
+              fileInput.value = '';
+              previewDiv.innerHTML = '';
+          });
       });
   });
 
-  window.onclick = function(event) {
-    const modal = document.getElementById('postModal');
-    if (event.target === modal) {
-      closePostModal();
-    }
-  };
-  
-  let debounceTimeout;
-  function searchUsers() {
-    const input = document.getElementById('searchInput');
-    const filter = input.value.toLowerCase();
-    const users = document.querySelectorAll('.user-item');
-
-    clearTimeout(debounceTimeout);
-    debounceTimeout = setTimeout(() => {
-      users.forEach(user => {
-        const username = user.getAttribute('data-username');
-        user.style.display = username.includes(filter) ? '' : 'none';
-      });
-    }, 300);
-  }
-
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const fileInput = document.getElementById('post-media-upload');
-    const previewDiv = document.getElementById('post-media-preview');
+  function validatePostForm() {
+    const editorContent = quill.root.innerHTML.trim();
+    const mediaUpload = document.getElementById("post-media-upload").files.length;
+    const category = document.getElementById("category").value;
     
-    fileInput.addEventListener('change', function(e) {
-        const file = this.files[0];
-        if (!file) return;
-        
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Dosya boyutu 5MB\'dan küçük olmalıdır');
-            this.value = '';  
-            previewDiv.innerHTML = '';  
-            return;
-        }
-        
-        previewDiv.innerHTML = `
-            <div class="file-info">
-                <i class="fas fa-image"></i>
-                <span class="file-name">${file.name}</span>
-                <button type="button" class="remove-file">×</button>
-            </div>`;
-        
-        const removeButton = previewDiv.querySelector('.remove-file');
-        removeButton.addEventListener('click', function() {
-            fileInput.value = '';
-            previewDiv.innerHTML = '';
-        });
-    });
-});
-
-function validatePostForm() {
-  const editorContent = quill.root.innerHTML.trim();
-  const mediaUpload = document.getElementById("post-media-upload").files.length;
-  const category = document.getElementById("category").value;
-  
-  if (!category) {
-    alert("Lütfen bir kategori seçin!");
-    return false;
-  }
-
-  if (!editorContent && mediaUpload === 0) {
-    alert("İçerik yazmalı veya medya yüklemelisiniz!");
-    return false;
-  }
-
-  document.getElementById('content').value = editorContent;
-  return true;
-}
-
-const Embed = Quill.import('blots/embed');
-
-class LinkBlot extends Embed {
-    static create(value) {
-        let node = super.create();
-        node.setAttribute('href', value);
-        node.setAttribute('target', '_blank');
-        node.setAttribute('rel', 'noopener noreferrer');
-        node.textContent = value;
-        return node;
+    if (!category) {
+      alert("Lütfen bir kategori seçin!");
+      return false;
     }
 
-    static value(node) {
-        return node.getAttribute('href');
+    if (!editorContent && mediaUpload === 0) {
+      alert("İçerik yazmalı veya medya yüklemelisiniz!");
+      return false;
     }
-}
-LinkBlot.blotName = 'link';
-LinkBlot.tagName = 'a';
-Quill.register(LinkBlot);
+
+    document.getElementById('content').value = editorContent;
+    return true;
+  }
+
+  const Embed = Quill.import('blots/embed');
+
+  class LinkBlot extends Embed {
+      static create(value) {
+          let node = super.create();
+          node.setAttribute('href', value);
+          node.setAttribute('target', '_blank');
+          node.setAttribute('rel', 'noopener noreferrer');
+          node.textContent = value;
+          return node;
+      }
+
+      static value(node) {
+          return node.getAttribute('href');
+      }
+  }
+  LinkBlot.blotName = 'link';
+  LinkBlot.tagName = 'a';
+  Quill.register(LinkBlot);
 </script>
 
 {% endblock %}

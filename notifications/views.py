@@ -23,14 +23,9 @@ def create_message_notification(user, sender):
     message = f"{sender} size yeni bir mesaj gönderdi."
     Notification.objects.create(user=user, message=message, notification_type='message')
 
-# Yorum düzenleme ve silme bildirimleri
 def create_comment_edit_notification(user, post, comment):
     message = f"'{post.title}' başlıklı gönderinizdeki yorum düzenlendi: {comment.content[:30]}..."
     Notification.objects.create(user=user, message=message, notification_type='comment_edit', post=post)
-
-def create_comment_delete_notification(user, post, comment):
-    message = f"'{post.title}' başlıklı gönderinizdeki yorum silindi."
-    Notification.objects.create(user=user, message=message, notification_type='comment_delete', post=post)
 
 # Yorumları İşleme
 @login_required
@@ -62,12 +57,7 @@ def edit_comment(request, comment_id):
 @login_required
 def delete_comment(request, comment_id):
     comment = Comment.objects.get(id=comment_id)
-    post = comment.post
-
-    if request.method == 'POST':
-        # Yorum silindiğinde bildirim gönder
-        comment.delete()
-        create_comment_delete_notification(post.user, post, comment)
+    comment.delete()
         
     return JsonResponse({'status': 'comment_deleted'})
 

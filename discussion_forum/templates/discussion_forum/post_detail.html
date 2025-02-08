@@ -15,34 +15,42 @@
     
 
     document.addEventListener('DOMContentLoaded', function() {
-        const fileInput = document.getElementById('media-upload');
-        const previewDiv = document.getElementById('media-preview');
-        
-        fileInput.addEventListener('change', function(e) {
-            const file = this.files[0];
-            if (!file) return;
+        // Her yorum için medya yükleme işleyicisini ekle
+        document.querySelectorAll('[id^="edit-media-upload-"]').forEach(function(input) {
+            const commentId = input.id.split('-').pop();
+            const previewDiv = document.getElementById(`edit-media-preview-${commentId}`);
             
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Dosya boyutu 5MB\'dan küçük olmalıdır');
-                this.value = '';  
-                previewDiv.innerHTML = '';  
-                return;
-            }
-            
-            previewDiv.innerHTML = `
-                <div class="file-info">
-                    <i class="fas fa-image"></i>
-                    <span class="file-name">${file.name}</span>
-                    <button type="button" class="remove-file">×</button>
-                </div>`;
-            
-            const removeButton = previewDiv.querySelector('.remove-file');
-            removeButton.addEventListener('click', function() {
-                fileInput.value = '';
-                previewDiv.innerHTML = '';
+            input.addEventListener('change', function(e) {
+                const file = this.files[0];
+                if (!file) return;
+                
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Dosya boyutu 5MB\'dan küçük olmalıdır');
+                    this.value = '';
+                    previewDiv.innerHTML = '';
+                    return;
+                }
+                
+                previewDiv.innerHTML = `
+                    <div class="file-info">
+                        <i class="fas fa-image"></i>
+                        <span class="file-name">${file.name}</span>
+                        <button type="button" class="remove-file">×</button>
+                    </div>`;
+                
+                const removeButton = previewDiv.querySelector('.remove-file');
+                removeButton.addEventListener('click', function() {
+                    input.value = '';
+                    previewDiv.innerHTML = '';
+                });
             });
         });
     });
+    
+    function removeExistingCommentMedia(commentId) {
+        document.getElementById(`remove-media-${commentId}`).value = 'true';
+        document.getElementById(`edit-media-preview-${commentId}`).innerHTML = '';
+    }
     
     function validateForm() {
         const commentContent = document.getElementById("comment_content").value.trim();
@@ -336,14 +344,35 @@
                             </form>
                         </div>
                         
-                        <form method="post" id="edit-form-{{ comment.id }}" class="edit-form" style="display: none;">
+                        <!-- Yorum Duzenleme -->
+                        <form method="post" id="edit-form-{{ comment.id }}" class="edit-comment-form" style="display: none;" enctype="multipart/form-data">
                             {% csrf_token %}
                             <input type="hidden" name="comment_id" value="{{ comment.id }}">
-                            <div class="django-ckeditor-widget">
-                                <textarea name="edited_content" class="custom-textarea">{{ comment.content|safe }}</textarea>
+                            <div class="edit-comment-textarea-container">
+                                <textarea name="edited_content" class="edit-comment-textarea">{{ comment.content|safe }}</textarea>
                             </div>
-                            <button type="submit" name="edit_comment" class="submit-comment-btn">Kaydet</button>
-                            <button type="button" onclick="hideEditForm({{ comment.id }})" class="cancel-btn">İptal</button>
+                            
+                            <div class="edit-comment-media-upload">
+                                <input type="file" name="edited_media" id="edit-media-upload-{{ comment.id }}" accept="image/*" style="display: none;">
+                                <label for="edit-media-upload-{{ comment.id }}" class="edit-comment-media-btn">
+                                    <i class="fas fa-image"></i> Resim/Gif Değiştir
+                                </label>
+                                <div id="edit-media-preview-{{ comment.id }}">
+                                    {% if comment.media_data %}
+                                        <div class="edit-comment-file-info">
+                                            <i class="fas fa-image"></i>
+                                            <span class="edit-comment-file-name">Mevcut medya</span>
+                                            <button type="button" class="edit-comment-remove-file" onclick="removeExistingCommentMedia({{ comment.id }})">×</button>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <input type="hidden" name="remove_media" id="remove-media-{{ comment.id }}" value="false">
+                            
+                            <div class="edit-comment-buttons">
+                                <button type="submit" name="edit_comment" class="edit-comment-save-btn">Kaydet</button>
+                                <button type="button" onclick="hideEditForm({{ comment.id }})" class="edit-comment-cancel-btn">İptal</button>
+                            </div>
                         </form>
                     {% endif %}
                 </div>
@@ -831,6 +860,120 @@
     
     #edit-media-preview .file-info {
         margin-top: 10px;
+    }
+
+
+    .edit-comment-form {
+    background-color: #232323;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #af9595;
+    margin-top: 15px;
+    }
+
+    .edit-comment-textarea-container {
+        margin-bottom: 15px;
+    }
+
+    .edit-comment-textarea {
+        width: 100%;
+        min-height: 100px;
+        background-color: #333;
+        color: #fff;
+        border: 1px solid #555;
+        padding: 10px;
+        border-radius: 4px;
+        resize: vertical;
+    }
+
+    .edit-comment-media-upload {
+        margin: 15px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .edit-comment-media-btn {
+        padding: 8px 15px;
+        background-color: #444;
+        color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.3s;
+    }
+
+    .edit-comment-media-btn:hover {
+        background-color: #555;
+    }
+
+    .edit-comment-file-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #333;
+        padding: 6px 12px;
+        border-radius: 4px;
+    }
+
+    .edit-comment-file-name {
+        color: #fff;
+        font-size: 14px;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .edit-comment-remove-file {
+        background: none;
+        border: none;
+        color: #ff4444;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 0 4px;
+    }
+
+    .edit-comment-remove-file:hover {
+        color: #ff0000;
+    }
+
+    .edit-comment-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .edit-comment-save-btn {
+        background-color: #4CAF50;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .edit-comment-cancel-btn {
+        background-color: #666;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .edit-comment-save-btn:hover {
+        background-color: #45a049;
+    }
+
+    .edit-comment-cancel-btn:hover {
+        background-color: #777;
     }
 </style>
 {% endblock %}

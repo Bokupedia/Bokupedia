@@ -112,23 +112,18 @@ def forum_index(request):
     if search_query:
         all_users = all_users.filter(username__icontains=search_query)
 
-    paginator = Paginator(all_posts, 10)
+    paginator = Paginator(all_posts, 20)
     page = request.GET.get('page', 1)
 
     total_users = User.objects.count()
     total_posts = Post.objects.count()
     total_categories = Category.objects.count()
     
-    active_sessions = Session.objects.filter(expire_date__gte=timezone.now()).count()
-
-    # Son 15 dakikada aktif olan kullanıcılar
-    active_time_threshold = timezone.now() - timedelta(minutes=2)
+    # Son 5 dakikada aktif olan kullanıcılar
+    active_time_threshold = timezone.now() - timedelta(minutes=5)
     active_users = User.objects.filter(last_login__gte=active_time_threshold)
 
-    active_users_count = active_users.count()
-
     active_users_names = [user.username for user in active_users]
-    active_users_count = len(active_users_names)
 
     try:
         latest_posts = paginator.page(page)
@@ -241,6 +236,20 @@ def post_detail(request, post_id):
 
             if comment.author == request.user or request.user.is_staff:
                 comment.content = edited_content
+                
+                remove_media = request.POST.get('remove_media') == 'true'
+                if remove_media:
+                    comment.media_data = None
+                    comment.media_type = None
+                
+                if 'edited_media' in request.FILES:
+                    file = request.FILES['edited_media']
+                    if file.size > 5 * 1024 * 1024:
+                        raise ValidationError("Dosya boyutu 5MB'dan küçük olmalı")
+                    
+                    comment.media_data = base64.b64encode(file.read()).decode('utf-8')
+                    comment.media_type = file.content_type
+                
                 comment.save()
                 
         elif 'delete_comment' in request.POST:
