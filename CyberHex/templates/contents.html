@@ -3,76 +3,112 @@
 {% block content %}
 {% if user.is_authenticated %}
 <style>
-      .contents-categories h2 {
-        padding-left: 8px;
-      }
-      
-      .contents-categories ul {
-        list-style-type: none;
-        padding: 8px;
-        display: flex;
-        gap: 12px;
-        flex-direction: column;
-      }
-      
-      .contents-categories ul li {
-        padding: 8px 16px;
-        background-color: #3f3f3f;
-        border-radius: 5px;
-        transition: background-color 0.3s ease;
-      }
-      
-      .contents-categories li:hover {
-        background-color: #8f0303;
-      }
-      
-      .contents-categories a {
-        color: #cab7b7;
-        text-decoration: none;
-        font-weight: bold;
-      }
-      
-      .contents-categories ul ul {
-        margin-left: 12pxpx;
-        margin-top: 8px;
-      }
-
-      .contents-container {
+    .contents-container {
         display: flex;
         justify-content: center;
+        align-items: center;
         min-height: 80vh;
-        padding: 3em 0;
+        padding: 2em;
     }
-    
+
     .contents-card {
         width: 100%;
-        max-width: 800px;
-        background-color: rgba(0, 0, 0, 0.6);  /* sondaki opaklık değeri */
-        padding: 2.5em;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        color: #e0e0e0;
+        max-width: 900px;
+        background-color:rgb(0, 0, 0, 0.6);
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        padding: 3em 2em;
+        color: #f1f1f1;
+        transition: transform 0.3s ease;
     }
-    
+
+    .contents-card:hover {
+        transform: translateY(-10px);
+    }
+
+    h2 {
+        text-align: center;
+        color: #ff6f61;
+        font-size: 2rem;
+        margin-bottom: 1em;
+        letter-spacing: 1px;
+    }
+
+    /* Kategori liste stil ayarları */
+    .contents-categories ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .contents-categories ul li {
+        margin-bottom: 1em;
+        background-color: #3c3c3c;
+        border-radius: 8px;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .contents-categories ul li:hover {
+        background-color: #ff6f61;
+        transform: translateX(5px);
+    }
+
+    .contents-categories a {
+        color: #f1f1f1;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    /* Boş içerik durumu */
+    .contents-categories ul li.empty {
+        background-color: #707070;
+        font-style: italic;
+        text-align: center;
+    }
+
+    /* Giriş yapma mesajı */
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        background-color: #fff;
+        padding: 2em;
+    }
+
+    .auth h2 {
+        font-size: 2rem;
+        color: #333;
+        text-align: center;
+        background-color: #ff6f61;
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+
 </style>
 <main class="contents-container">
     <div class="contents-card">
-        
         <section class="contents-categories">
             <h2>İçeriklerimiz</h2>
             <ul>
                 {% for category in categories %}
-                <li>
-                    <a href="{% url 'discussion_forum:category_topics' category_id=category.id %}">
-                        {{ category.name }}
-                    </a>
-                </li>
+                    <li>
+                        <a href="{% url 'discussion_forum:category_topics' category_id=category.id %}">
+                          📢 {{ category.name }}
+                        </a>
+                    </li>
                 {% empty %}
-                <li>Hiçbir içerik bulunamadı.</li>
+                    <li class="empty">Hiçbir içerik bulunamadı.</li>
                 {% endfor %}
             </ul>
         </section>
-        
     </div>
 </main>
 {% else %}
