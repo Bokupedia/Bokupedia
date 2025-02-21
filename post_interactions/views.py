@@ -16,7 +16,7 @@ def profile_posts(request):
     
     user_posts = Post.objects.filter(author=request.user).order_by('-created_at')
     
-    paginator = Paginator(user_posts, 5)
+    paginator = Paginator(user_posts, 10)
     page = request.GET.get('page', 1)
 
     try:

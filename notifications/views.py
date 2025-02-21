@@ -67,7 +67,7 @@ def notification_list(request):
     notification_list = Notification.objects.filter(user=request.user).order_by('-created_at')
     
     # Add pagination
-    paginator = Paginator(notification_list, 5) 
+    paginator = Paginator(notification_list, 20) 
     page = request.GET.get('page', 1)
 
     try:
