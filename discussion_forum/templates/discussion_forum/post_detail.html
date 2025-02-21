@@ -148,11 +148,18 @@
         <div class="post-author-section">
             <h2>
                 Yazar:
-                <a href="/accounts/profile/{{ post.author.username }}">
-                    <u style="color:hsla(79, 100.00%, 50.00%, 0.80)"><strong style="color:hsla(79, 100.00%, 50.00%, 0.80)">{{ post.author }}</strong></u>
+                <a href="/accounts/profile/{{post.author.username}}">
+                    <strong style="color:hsla(79, 100.00%, 50.00%, 0.80)"><u style="color:hsla(79, 100.00%, 50.00%, 0.80)">{{post.author}}</u></strong>
                 </a>
             </h2>
-            
+            <h2>
+            {% if post.category %}
+                    <strong>Kategoriye Git ➡   </strong> 
+                    <a href="{% url 'discussion_forum:category_topics' category_id=post.category.id %}" style="color: darkred;">
+                        {{post.category.name}}
+                    </a>
+            {% endif %}
+            </h2> 
             {% if post.author == request.user or request.user.is_staff %}
                 <div class="post-actions">
                     <button class="edit-post-btn" onclick="showPostEditForm()">Gönderiyi Düzenle</button>

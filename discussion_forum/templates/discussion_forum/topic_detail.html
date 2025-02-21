@@ -5,125 +5,185 @@
 
 <style>
   .red-underlined {
-    color: #e50202;
+    color: #ff3333;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.red-underlined:hover {
+    color: #ff5555;
     text-decoration: underline;
 }
 
-  .topic-posts {
+.topic-posts {
     max-width: 1200px;
-    width: 100%;
+    width: 90%;
     margin: 30px auto 60px auto;
-    padding: 20px;
-    background-color: #121212;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
-  }
+    padding: 30px;
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease-out forwards;
+}
 
-  .topic-posts h2 {
-    color: #cab7b7;
-    border-bottom: 2px solid #5e0000;
-    padding-bottom: 10px;
-  }
+.topic-posts-left {
+  max-width: 1200px;
+  width: 80%;
+  margin: 30px auto 60px auto;
+  padding: 30px;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.5s ease-out forwards;
+}
 
-  .topic-posts ul {
+.topic-posts h2 {
+    color: #ffffff;
+    font-size: 2.2em;
+    border-bottom: 3px solid #ff3333;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+.topic-posts ul {
     list-style-type: none;
     padding: 0;
-  }
+}
 
-  .topic-posts li {
-    background-color: rgb(27, 27, 27);
-    border-radius: 5px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
+.topic-posts li {
+    background-color: #252525;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
 
-  .topic-posts a {
-    color: #b1b1b1;
+.topic-posts li:hover {
+    transform: translateX(5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.topic-posts a {
+    color: #ffffff;
     text-decoration: none;
-  }
+    transition: color 0.3s ease;
+}
 
-  .topic-posts a:hover {
-    color: #e50202;
-  }
+.topic-posts a:hover {
+    color: #ff3333;
+}
 
-  .topic-posts small {
-    color: #6c757d;
-  }
+.topic-posts small {
+    color: #888;
+}
 
-  .pagination {
-      margin: 20px 0;
-      text-align: center;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-  }
+.pagination {
+    margin: 30px 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
 
-  .pagination a, .pagination span {
-      color: #c0c0c0;
-      padding: 8px 16px;
-      text-decoration: none;
-      border: 1px solid #2d2d2d;
-      border-radius: 4px;
-      background-color: #1d1d1d;
-      transition: background-color 0.3s ease;
-  }
+.pagination a, .pagination span {
+    color: #ffffff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border: none;
+    border-radius: 6px;
+    background-color: #252525;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
 
-  .pagination a:hover {
-      background-color: #2d2d2d;
-      color: #c70101;
-  }
+.pagination a:hover {
+    background-color: #ff3333;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
 
-  .pagination .current-page {
-      background-color: #5e0000;
-      color: white;
-      border-color: #5e0000;
-  }
+.pagination .current-page {
+    background-color: #ff3333;
+    color: white;
+}
 
-  .topic-post-card {
-    background-color: hsl(0, 87%, 9%);
-    padding: 15px;
+.topic-post-card {
+    background-color: #252525;
+    padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
-  }
+    border-left: 4px solid #ff3333;
+    transition: all 0.3s ease;
+}
 
-  .topic-post-headers {
+.topic-post-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.topic-post-headers {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 1em;
-    font-size: 0.9em;
-    color: #696969;
-  }
-
-  .topic-post-card a {
-    color: white !important;
-  }
-
-  .topic-post-card a:hover {
-    color: white !important;
-  }
-
-  .topic-post-headers p {
-    margin: 0;
-  }
-
-  .topic-post-headers strong {
-    color: #e0e0e0;
-  }
-
-  .topic-post-content {
+    margin-bottom: 1.5em;
     font-size: 1em;
-    color: #ddd;
-    line-height: 1.6;
-  }
-
-  .topic-no-post {
     color: #888;
+}
+
+.topic-post-headers p {
+    margin: 0;
+}
+
+.topic-post-headers strong {
+    color: #ff3333;
+    font-weight: 600;
+}
+
+.topic-post-content {
+    font-size: 1.1em;
+    color: #e6e6e6;
+    line-height: 1.8;
+    margin: 15px 0;
+}
+
+.topic-no-post {
+    color: #999;
     font-style: italic;
     text-align: center;
-    padding: 1em 0;
-  }
+    padding: 2em;
+    background-color: #252525;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.topic-header-left {
+    background-color: #252525;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #ff3333;
+}
+
+.topic-content-left {
+    color: #e6e6e6;
+    line-height: 1.8;
+    font-size: 1.1em;
+    margin: 0;
+    
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 </style>
 
 {% if  topic.content|striptags|cut:" "|cut:"&nbsp;"|cut:"-" %}
@@ -131,11 +191,11 @@
 {% endif %}
   {% if not topic.content|striptags|cut:" "|cut:"&nbsp;"|cut:"-" %}
   {% else %}
-    <section class="topic-posts">
-      <div class="topic-header">
-        <p class="topic-content">{{ topic.content|safe }}</p>
-      </div>
-    </section>
+  <section class="topic-posts-left">
+    <div class="topic-header-left">
+      <p class="topic-content-left">{{ topic.content|safe }}</p>
+    </div>
+  </section>
   {% endif %}
  <section class="topic-posts">
    <h2>Gönderiler</h2>

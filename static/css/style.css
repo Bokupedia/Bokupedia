@@ -222,7 +222,7 @@
 
   /* Background */
   .bg-wallpaper {
-    background: url('/static/images/wallpapers/wallpaper2.jpg');
+    background: url('/static/images/wallpapers/wallpaper.jpg');
     background-color: #121212;
     background-size: cover;
     background-position: center;
