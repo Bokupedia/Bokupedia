@@ -155,7 +155,7 @@
             <h2>
             {% if post.category %}
                     <strong>Kategoriye Git ➡   </strong> 
-                    <a href="{% url 'discussion_forum:category_topics' category_id=post.category.id %}" style="color: darkred;">
+                    <a href="{% url 'discussion_forum:category_topics' category_id=post.category.id %}" style="color: #ff5555;">
                         {{post.category.name}}
                     </a>
             {% endif %}

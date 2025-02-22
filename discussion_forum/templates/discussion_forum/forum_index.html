@@ -6,10 +6,9 @@
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 {% endblock %}
 <main class="forum-container">
-
   <section class="users-container">
-    <div class="users-container">
-        <h2>Tüm Bokupedialılar</h2>
+    <div class="users-section">
+        <h2 class="section-header">Tüm Bokupedialılar</h2>
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Kullanıcı ara..." onkeyup="searchUsers()">
         </div>
@@ -26,77 +25,73 @@
   <section class="latest-posts">
     {% if user.is_authenticated %}
     <div class="header-section">
-      <h2>Son Gönderiler</h2>
+      <h2 class="section-header">Son Gönderiler</h2>
       <strong><button class="new-post-btn" onclick="openPostModal()">Yeni Gönderi</button></strong>
     </div>
-    <ul>
+    <ul class="posts-list">
       {% for post in latest_posts %}
-      <li>
-          <p>
-              <strong style="color:hsla(79, 100.00%, 50.00%, 0.80)">{{ post.author.username }}</strong> - 
-              <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}">
-                  {{ post.category.name }} {{ post.topic.title }} 
-              </a>
-              <span style="float: right;">
-                  <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}" style="color:#e50202; font-weight: bold;">
-                      Daha fazlası için tıkla...
-                  </a>
-              </span>
-          </p>
-          <div>
-              {{ post.content|striptags|escape|truncatewords:20 }}
+      <li class="post-card">
+          <div class="post-content">
+              <div class="post-header">
+                  <strong class="author-name">{{ post.author.username }}</strong>
+                  <span class="post-category">{{ post.category.name }}{% if post.topic %} / {{post.topic.title}}{% endif %}</span>
+              </div>
+              <div class="post-body">
+                  {{ post.content|striptags|escape|truncatewords:20 }}
+              </div>
+              <div class="post-footer">
+                  <small class="post-date">{{ post.created_at|date:"d M Y H:i" }}</small>
+                  <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}" class="read-more">Daha fazlası için tıkla...</a>
+              </div>
           </div>
-          <p><small>{{ post.created_at|date:"d M Y H:i" }}</small></p>
       </li>
       {% empty %}
-      <li>Herhangi bir gönderi yok.</li>
+      <li class="no-posts">Herhangi bir gönderi yok.</li>
       {% endfor %}
     </ul>
-  
 
-    <!-- Post Modal -->
-    <div id="postModal" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closePostModal()">&times;</span>
-        <h2>Yeni Gönderi Oluştur</h2>
-        <form method="POST" action="{% url 'discussion_forum:create_post' %}" class="post-form" enctype="multipart/form-data" onsubmit="return validatePostForm()">
-          {% csrf_token %}
-          <div class="form-group">
-            <label for="category">Kategori:</label>
-            <select name="category" id="category" required>
-              <option value="">Kategori Seçin</option>
-              {% for category in categories %}
-                <option value="{{ category.id }}">{{ category.name }}</option>
-              {% endfor %}
-            </select>
+        <!-- Post Modal -->
+        <div id="postModal" class="modal">
+          <div class="modal-content">
+            <span class="close" onclick="closePostModal()">&times;</span>
+            <h2>Yeni Gönderi Oluştur</h2>
+            <form method="POST" action="{% url 'discussion_forum:create_post' %}" class="post-form" enctype="multipart/form-data" onsubmit="return validatePostForm()">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="category">Kategori:</label>
+                <select name="category" id="category" required>
+                  <option value="">Kategori Seçin</option>
+                  {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="topic">Başlık:</label>
+                <select name="topic" id="topic">
+                  <option value="">Başlık Seçin (Varsa 😉)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="content">İçerik:</label>
+                <div id="editor-container" style="height: 200px;"></div>
+                <input type="hidden" name="content" id="content">
+              </div>
+              
+              <!-- Add media upload section -->
+              <div class="media-upload">
+                <input type="file" name="media" id="post-media-upload" accept="image/*" style="display: none;">
+                <label for="post-media-upload" class="media-upload-btn">
+                  <i class="fas fa-image"></i> Resim/Gif Ekle
+                </label>
+                <div id="post-media-preview"></div>
+              </div>
+              
+              <button type="submit" class="submit-btn">Gönder</button>
+            </form>
           </div>
-          <div class="form-group">
-            <label for="topic">Başlık:</label>
-            <select name="topic" id="topic">
-              <option value="">Başlık Seçin (Varsa 😉)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="content">İçerik:</label>
-            <div id="editor-container" style="height: 200px;"></div>
-            <input type="hidden" name="content" id="content">
-          </div>
-          
-          <!-- Add media upload section -->
-          <div class="media-upload">
-            <input type="file" name="media" id="post-media-upload" accept="image/*" style="display: none;">
-            <label for="post-media-upload" class="media-upload-btn">
-              <i class="fas fa-image"></i> Resim/Gif Ekle
-            </label>
-            <div id="post-media-preview"></div>
-          </div>
-          
-          <button type="submit" class="submit-btn">Gönder</button>
-        </form>
-      </div>
-    </div>
+        </div>
 
-    <!-- Pagination -->
     {% if latest_posts.has_other_pages %}
         <div class="pagination">
             {% if latest_posts.has_previous %}
@@ -119,7 +114,7 @@
   </section>
 
   <section class="stats-container">
-    <h2>Topluluk İstatistikleri</h2>
+    <h2 class="section-header">Topluluk İstatistikleri</h2>
     <div class="stats-grid">
       <div class="stat-item">
         <h4>Çevrimiçi</h4>
@@ -145,525 +140,543 @@
 </main>
 
 <style>
-  /* Cross-browser compatible CSS */
-  .forum-container {
+.forum-container {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
-    grid-auto-rows: max-content;
     gap: 20px;
     max-width: 1500px;
     margin: 0 auto;
-    padding: 0;
-    overflow-x: hidden !important;
-  }
-  
-  .users-sidebar {
-    background-color: #121212;
+    padding: 20px;
+}
+
+.section-header {
+    color: #ff3333;
+    font-size: 1.8em;
+    border-bottom: 3px solid #ff3333;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+/* Users Section */
+.users-section {
+    background-color: rgba(0, 0, 0, 0.6);
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    min-height: auto; /* Fallback */
-    height: fit-content; /* Modern browsers */
-    height: -moz-fit-content; /* Firefox */
-    height: -webkit-fit-content; /* Webkit-based browsers */
-  }
-  
-  .latest-posts {
-    width: 700px;
-    max-width: 1200px;
-    padding: 20px;
-    background-color: #121212;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
-  }
-  
-  .users-container {
-    background-color: #121212;
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
-    min-height: auto; /* Fallback */
-    height: fit-content; /* Modern browsers */
-    height: -moz-fit-content; /* Firefox */
-    height: -webkit-fit-content; /* Webkit-based browsers */
-  }
-  
-  .users-container h2 {
-    color: #cab7b7;
-    border-bottom: 2px solid #5e0000;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-  }
-  
-  .search-container {
-    margin-bottom: 15px;
-  }
-  
-  .search-container input {
-    width: max-content;
-    padding: 8px;
-    border-radius: 4px;
-    background-color: #2d2d2d;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgb(48, 48, 48);
+}
+
+.search-container input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    background-color: #252525;
     border: 1px solid #3d3d3d;
     color: #fff;
-  }
-  
-  .users-list {
+    margin-bottom: 15px;
+}
+
+.users-list {
     max-height: 500px;
     overflow-y: auto;
-  }
-  
-  .user-item {
-    background-color: rgb(27, 27, 27);
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 8px;
-    transition: background-color 0.3s;
-  }
-  
-  .user-item:hover {
+}
+
+.user-item {
+    background-color: #252525;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border-left: 4px solid #ff3333;
+    transition: all 0.3s ease;
+}
+
+.user-item:hover {
+    transform: translateX(5px);
     background-color: #2d2d2d;
-  }
-  
-  .username {
-    color: #b1b1b1;
-    font-size: 14px;
-  }
-  
-  .users-list::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  .users-list::-webkit-scrollbar-track {
-    background: #1b1b1b;
-    border-radius: 4px;
-  }
-  
-  .users-list::-webkit-scrollbar-thumb {
-    background: #5e0000;
-    border-radius: 4px;
-  }
-  
-  .users-list::-webkit-scrollbar-thumb:hover {
-    background: #7a0000;
-  }
-  
-  .users-list {
-    scrollbar-color: #5e0000 #1b1b1b; /* thumb color, track color */
-  }
-  
-  .users-list:hover {
-    scrollbar-color: #7a0000 #1b1b1b; /* thumb color on hover, track color */
-  }
-  
-  .latest-posts h2 {
-    color: #cab7b7;
-    border-bottom: 2px solid #5e0000;
-    padding-bottom: 10px;
-  }
-  
-  .latest-posts ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .latest-posts li {
-    background-color: rgb(27, 27, 27);
-    border-radius: 5px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
-  
-  .latest-posts a {
-    color: #b1b1b1;
+}
+
+.username {
+    color: #ffffff;
     text-decoration: none;
-  }
-  
-  .latest-posts small {
-    color: #6c757d;
-  }
-  
-  .pagination {
-    margin: 20px 0;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
-  
-  .pagination a, .pagination span {
-    color: #c0c0c0;
-    padding: 8px 16px;
-    text-decoration: none;
-    border: 1px solid #2d2d2d;
-    border-radius: 4px;
-    background-color: #1d1d1d;
-    transition: background-color 0.3s ease;
-  }
-  
-  .pagination a:hover {
-    background-color: #2d2d2d;
-    color: #c70101;
-  }
-  
-  .pagination .current-page {
-    background-color: #5e0000;
-    color: white;
-    border-color: #5e0000;
-  }
-  
-  .header-section {
+    font-size: 0.9em;
+}
+
+/* Latest Posts Section */
+.latest-posts {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgb(48, 48, 48);
+}
+
+.header-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .new-post-btn {
-    background-color: #5e0000;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .new-post-btn:hover {
-    background-color: #7a0000;
-  }
-  
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.7);
-  }
-  
-  .modal-content {
-    background-color: #1b1b1b;
-    margin: 10% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 600px;
-  }
-  
-  .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  .close:hover {
-    color: #fff;
-  }
-  
-  .post-form .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .post-form label {
-    display: block;
-    margin-bottom: 5px;
-    color: #cab7b7;
-  }
-  
-  .post-form select,
-  .post-form textarea {
-    width: 100%;
-    padding: 8px;
-    border-radius: 4px;
-    background-color: #2d2d2d;
-    border: 1px solid #3d3d3d;
-    color: #fff;
-  }
-  
-  .post-form .submit-btn {
-    background-color: #5e0000;
+}
+
+.new-post-btn {
+    background-color: #ff3333;
     color: white;
     border: none;
     padding: 10px 20px;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    width: 100%;
-  }
-  
-  .post-form .submit-btn:hover {
-    background-color: #7a0000;
-  }
-  
-  .media-upload {
-    margin-bottom: 15px;
-  }
-  
-  .media-upload-btn {
-    padding: 8px 15px;
-    background-color: #444;
-    color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: background-color 0.3s, transform 0.3s;
-  }
-  
-  .media-upload-btn:hover {
-    background-color: #555;
-    transform: scale(1.05);
-  }
-  
-  .file-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background-color: #333;
-    padding: 6px 12px;
-    border-radius: 4px;
-    margin-top: 10px;
-  }
-  
-  .file-name {
-    color: #fff;
-    font-size: 14px;
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  
-  .remove-file {
-    background: none;
-    border: none;
-    color: #ff4444;
-    font-size: 18px;
-    cursor: pointer;
-    padding: 0 4px;
-  }
-  
-  .remove-file:hover {
-    color: #ff0000;
-  }
-  
-  .stats-container {
-    background-color: #121212;
-    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.new-post-btn:hover {
+    background-color: #ff5555;
+    transform: translateY(-2px);
+}
+
+.posts-list {
+    list-style: none;
+    padding: 0;
+}
+
+.post-card {
+    background-color: #252525;
     padding: 20px;
-    box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
-    min-height: auto; /* Fallback */
-    height: fit-content; /* Modern browsers */
-    height: -moz-fit-content; /* Firefox */
-    height: -webkit-fit-content; /* Webkit-based browsers */
-  }
-  
-  .stats-container h2 {
-    color: #cab7b7;
-    border-bottom: 2px solid #5e0000;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-  }
-  
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-  }
-  
-  .stat-item {
-    background-color: #1b1b1b;
     border-radius: 8px;
-    padding: 15px;
+    margin-bottom: 20px;
+    border-left: 4px solid #ff3333;
+    transition: all 0.3s ease;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.post-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.author-name {
+    color: #ff3333;
+}
+
+.post-category {
+    color: #999;
+    font-size: 0.9em;
+}
+
+.post-body {
+    color: #fff;
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.post-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.post-date {
+    color: #999;
+}
+
+.read-more {
+    color: #ff3333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.read-more:hover {
+    color: #ff5555;
+    text-decoration: underline;
+}
+
+/* Stats Section */
+.stats-container {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgb(48, 48, 48);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+.stat-item {
+    background-color: #252525;
+    padding: 20px;
+    border-radius: 8px;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-  
-  .stat-item:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .stat-item h4 {
-    color: #cab7b7;
-    margin-bottom: 8px;
-  }
-  
-  .stat-item p {
+    border-left: 4px solid #ff3333;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateX(5px);
+    background-color: #2d2d2d;
+}
+
+.stat-item h4 {
+    color: #ff3333;
+    margin-bottom: 10px;
+}
+
+.stat-item p {
     color: #fff;
     font-size: 1.2em;
     font-weight: bold;
+}
+
+/* Modal Styling */
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+  background-color: rgba(0, 0, 0, 0.6);
+  margin: 5% auto;
+  padding: 25px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+  border: 1px solid rgb(48, 48, 48);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.close {
+  color: #ff3333;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.close:hover {
+  color: #ff5555;
+  transform: scale(1.1);
+}
+
+.post-form .form-group {
+  margin-bottom: 20px;
+}
+
+.post-form label {
+  display: block;
+  margin-bottom: 8px;
+  color: #ff3333;
+  font-weight: 500;
+}
+
+.post-form select,
+.post-form textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #252525;
+  border: 1px solid #3d3d3d;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.post-form select:focus,
+.post-form textarea:focus {
+  border-color: #ff3333;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 51, 51, 0.2);
+}
+
+.post-form .submit-btn {
+  background-color: #ff3333;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.post-form .submit-btn:hover {
+  background-color: #ff5555;
+  transform: translateY(-2px);
+}
+
+.media-upload {
+  margin-bottom: 20px;
+}
+
+.media-upload-btn {
+  padding: 12px 20px;
+  background-color: #252525;
+  color: #fff;
+  border: 1px solid #3d3d3d;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.media-upload-btn:hover {
+  background-color: #2d2d2d;
+  transform: translateY(-2px);
+  border-color: #ff3333;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #252525;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-top: 12px;
+  border-left: 4px solid #ff3333;
+}
+
+.file-name {
+  color: #fff;
+  font-size: 14px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remove-file {
+  background: none;
+  border: none;
+  color: #ff3333;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: all 0.3s ease;
+}
+
+.remove-file:hover {
+  color: #ff5555;
+  transform: scale(1.1);
+}
+
+@keyframes modalFadeIn {
+  from {
+      opacity: 0;
+      transform: translateY(-20px);
   }
-  
-  /* Media query for mobile responsiveness */
-  @media (max-width: 1024px) {
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+/* Pagination */
+.pagination {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.pagination a, .pagination span {
+    color: #ffffff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border: 1px solid #2d2d2d;
+    border-radius: 6px;
+    background-color: #252525;
+    transition: all 0.3s ease;
+}
+
+.pagination a:hover {
+    background-color: #ff3333;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.pagination .current-page {
+    background-color: #ff3333;
+    color: white;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
     .forum-container {
-      grid-template-columns: 1fr;
-      gap: 15px;
+        grid-template-columns: 1fr;
+        padding: 10px;
     }
-    .users-sidebar {
-      position: static;
+    
+    .section-header {
+        font-size: 1.5em;
     }
-  
-    .users-list {
-      max-height: 300px;
-      overflow-y: auto;
+    
+    .post-card {
+        padding: 15px;
     }
-  
-    .latest-posts {
-      width: 100%;
-      max-width: none;
-    }
-  
-    .pagination {
-      flex-direction: column;
-    }
-  
-    .stats-grid {
-      grid-template-columns: 1fr;
+}
+</style>
+
+<script>
+  let quill;
+
+  function openPostModal() {
+    document.getElementById('postModal').style.display = 'block';
+    
+    if (!quill) {
+      quill = new Quill('#editor-container', {
+        theme: 'snow',
+        placeholder: 'İçeriğinizi yazın...',
+        modules: {
+          toolbar: [
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'color': [] }, { 'background': [] }],
+          ]
+        }
+      });
     }
   }
-  
-</style>
-  
-<script>
-    let quill;
 
-    function openPostModal() {
-      document.getElementById('postModal').style.display = 'block';
-      
-      if (!quill) {
-        quill = new Quill('#editor-container', {
-          theme: 'snow',
-          placeholder: 'İçeriğinizi yazın...',
-          modules: {
-            toolbar: [
-              ['bold', 'italic', 'underline', 'strike'],
-              [{ 'color': [] }, { 'background': [] }],
-            ]
-          }
-        });
-      }
-    }
+  function closePostModal() {
+    document.getElementById('postModal').style.display = 'none';
+  }
 
-    function closePostModal() {
-      document.getElementById('postModal').style.display = 'none';
-    }
-
-    document.getElementById('category').addEventListener('change', function() {
-      const categoryId = this.value;
-      const topicSelect = document.getElementById('topic');
-      
-      fetch(`/api/topics/${categoryId}/`)
-        .then(response => response.json())
-        .then(data => {
-          topicSelect.innerHTML = '<option value="">Konu Seçin (Opsiyonel (Varsa 😉))</option>';
-          data.topics.forEach(topic => {
-            topicSelect.innerHTML += `<option value="${topic.id}">${topic.title}</option>`;
-          });
-        });
-    });
-
-    window.onclick = function(event) {
-      const modal = document.getElementById('postModal');
-      if (event.target === modal) {
-        closePostModal();
-      }
-    };
+  document.getElementById('category').addEventListener('change', function() {
+    const categoryId = this.value;
+    const topicSelect = document.getElementById('topic');
     
-    let debounceTimeout;
-    function searchUsers() {
-      const input = document.getElementById('searchInput');
-      const filter = input.value.toLowerCase();
-      const users = document.querySelectorAll('.user-item');
-
-      clearTimeout(debounceTimeout);
-      debounceTimeout = setTimeout(() => {
-        users.forEach(user => {
-          const username = user.getAttribute('data-username');
-          user.style.display = username.includes(filter) ? '' : 'none';
+    fetch(`/api/topics/${categoryId}/`)
+      .then(response => response.json())
+      .then(data => {
+        topicSelect.innerHTML = '<option value="">Konu Seçin (Opsiyonel (Varsa 😉))</option>';
+        data.topics.forEach(topic => {
+          topicSelect.innerHTML += `<option value="${topic.id}">${topic.title}</option>`;
         });
-      }, 300);
-    }
-
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const fileInput = document.getElementById('post-media-upload');
-      const previewDiv = document.getElementById('post-media-preview');
-      
-      fileInput.addEventListener('change', function(e) {
-          const file = this.files[0];
-          if (!file) return;
-          
-          if (file.size > 5 * 1024 * 1024) {
-              alert('Dosya boyutu 5MB\'dan küçük olmalıdır');
-              this.value = '';  
-              previewDiv.innerHTML = '';  
-              return;
-          }
-          
-          previewDiv.innerHTML = `
-              <div class="file-info">
-                  <i class="fas fa-image"></i>
-                  <span class="file-name">${file.name}</span>
-                  <button type="button" class="remove-file">×</button>
-              </div>`;
-          
-          const removeButton = previewDiv.querySelector('.remove-file');
-          removeButton.addEventListener('click', function() {
-              fileInput.value = '';
-              previewDiv.innerHTML = '';
-          });
       });
   });
 
-  function validatePostForm() {
-    const editorContent = quill.root.innerHTML.trim();
-    const mediaUpload = document.getElementById("post-media-upload").files.length;
-    const category = document.getElementById("category").value;
+  window.onclick = function(event) {
+    const modal = document.getElementById('postModal');
+    if (event.target === modal) {
+      closePostModal();
+    }
+  };
+  
+  let debounceTimeout;
+  function searchUsers() {
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toLowerCase();
+    const users = document.querySelectorAll('.user-item');
+
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+      users.forEach(user => {
+        const username = user.getAttribute('data-username');
+        user.style.display = username.includes(filter) ? '' : 'none';
+      });
+    }, 300);
+  }
+
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('post-media-upload');
+    const previewDiv = document.getElementById('post-media-preview');
     
-    if (!category) {
-      alert("Lütfen bir kategori seçin!");
-      return false;
-    }
+    fileInput.addEventListener('change', function(e) {
+        const file = this.files[0];
+        if (!file) return;
+        
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Dosya boyutu 5MB\'dan küçük olmalıdır');
+            this.value = '';  
+            previewDiv.innerHTML = '';  
+            return;
+        }
+        
+        previewDiv.innerHTML = `
+            <div class="file-info">
+                <i class="fas fa-image"></i>
+                <span class="file-name">${file.name}</span>
+                <button type="button" class="remove-file">×</button>
+            </div>`;
+        
+        const removeButton = previewDiv.querySelector('.remove-file');
+        removeButton.addEventListener('click', function() {
+            fileInput.value = '';
+            previewDiv.innerHTML = '';
+        });
+    });
+});
 
-    if (!editorContent && mediaUpload === 0) {
-      alert("İçerik yazmalı veya medya yüklemelisiniz!");
-      return false;
-    }
-
-    document.getElementById('content').value = editorContent;
-    return true;
+function validatePostForm() {
+  const editorContent = quill.root.innerHTML.trim();
+  const mediaUpload = document.getElementById("post-media-upload").files.length;
+  const category = document.getElementById("category").value;
+  
+  if (!category) {
+    alert("Lütfen bir kategori seçin!");
+    return false;
   }
 
-  const Embed = Quill.import('blots/embed');
-
-  class LinkBlot extends Embed {
-      static create(value) {
-          let node = super.create();
-          node.setAttribute('href', value);
-          node.setAttribute('target', '_blank');
-          node.setAttribute('rel', 'noopener noreferrer');
-          node.textContent = value;
-          return node;
-      }
-
-      static value(node) {
-          return node.getAttribute('href');
-      }
+  if (!editorContent && mediaUpload === 0) {
+    alert("İçerik yazmalı veya medya yüklemelisiniz!");
+    return false;
   }
-  LinkBlot.blotName = 'link';
-  LinkBlot.tagName = 'a';
-  Quill.register(LinkBlot);
+
+  document.getElementById('content').value = editorContent;
+  return true;
+}
+
+const Embed = Quill.import('blots/embed');
+
+class LinkBlot extends Embed {
+    static create(value) {
+        let node = super.create();
+        node.setAttribute('href', value);
+        node.setAttribute('target', '_blank');
+        node.setAttribute('rel', 'noopener noreferrer');
+        node.textContent = value;
+        return node;
+    }
+
+    static value(node) {
+        return node.getAttribute('href');
+    }
+}
+LinkBlot.blotName = 'link';
+LinkBlot.tagName = 'a';
+Quill.register(LinkBlot);
 </script>
 
 {% endblock %}
