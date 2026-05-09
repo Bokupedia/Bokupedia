@@ -1,97 +1,115 @@
 {% extends 'layout.html' %}
 {% load static %}
 {% block content %}
-<main class="mission-container">
-   <div class="mission-card">
-      <img src="{% static 'images/bandofhawk.jpeg' %}" alt="Band of Hawk" />
-      
-      <h1>Bokupedia</h1>
-      <h2>İnternetin göt deliğine hoş geldiniz! </h2>
-      <h2>Bokupedia, 31/12/2024 tarihinde temelleri Raptor tarafından atılmış,
-         12/01/2025'te hayata geçmiş bir forumdur.</h2>
-      
 
-      <h1>Band of 35</h1>
-      <h2>Band of 35, Discord temelli bir eğlence kuruluşudur. 04/12/2022 tarihinde Yiğit Anıl Tırpancı tarafından kurulmuştur. 
-        Eğlencenin merkezi olan sunucumuzda kapımız herkese kapalıdır,
-         hiç kimseye din, dil, ırk, yaş fark etmeksizin eşit şekilde yaklaşılmaz ve saygı gösterilmez.</h2>
-      
-      <h1>Bokupedia'da Neler Var?</h1>
-      <ul>
-         <li>Demode ve komik olmayan içerikler</li>
-         <li>Topluluk tarafından oluşturulan memeler, şakalar ve absürt tartışmalar</li>
-         <li>Band of 35’in eğlencesiz ruhunu yaşatan etkinlikler</li>
-         <li>Sansürlü, mahkum ve samimi olmayan bir topluluk</li>
-         <li>Arkadaşlıklar kurup internetin en neşesiz insanlarıyla tanışma fırsatı</li>
-         <li>Hayatınızın en kötü deneyimi.</li>
-      </ul>
-      
-      <h2>İnternet mi etmek istiyosun? Bokupedia’ya gel, yardımcı olalım! 🤣🤣🤣🫵🏼🫵🏼🫵🏼</h2>
-   </div>
-</main>
+<section class="mission-section">
+  <img src="{% static 'images/bandofhawk.jpeg' %}" alt="Band of Hawk" class="mission-banner" />
+
+  <div class="mission-block">
+    <h1>Bokupedia</h1>
+    <p>İnternetin göt deliğine hoş geldiniz!</p>
+    <p>Bokupedia, 31/12/2024 tarihinde temelleri Raptor tarafından atılmış, 12/01/2025'te hayata geçmiş bir forumdur.</p>
+  </div>
+
+  <div class="mission-divider"></div>
+
+  <div class="mission-block">
+    <h1>Band of 35</h1>
+    <p>Band of 35, Discord temelli bir eğlence kuruluşudur. 04/12/2022 tarihinde Yiğit Anıl Tırpancı tarafından kurulmuştur.
+      Eğlencenin merkezi olan sunucumuzda kapımız herkese kapalıdır,
+      hiç kimseye din, dil, ırk, yaş fark etmeksizin eşit şekilde yaklaşılmaz ve saygı gösterilmez.</p>
+  </div>
+
+  <div class="mission-divider"></div>
+
+  <div class="mission-block">
+    <h1>Bokupedia'da Neler Var?</h1>
+    <ul class="mission-list">
+      <li>Demode ve komik olmayan içerikler</li>
+      <li>Topluluk tarafından oluşturulan memeler, şakalar ve absürt tartışmalar</li>
+      <li>Band of 35'in eğlencesiz ruhunu yaşatan etkinlikler</li>
+      <li>Sansürlü, mahkum ve samimi olmayan bir topluluk</li>
+      <li>Arkadaşlıklar kurup internetin en neşesiz insanlarıyla tanışma fırsatı</li>
+      <li>Hayatınızın en kötü deneyimi.</li>
+    </ul>
+    <p class="mission-cta">İnternet mi etmek istiyosun? Bokupedia'ya gel, yardımcı olalım! 🤣🤣🤣🫵🏼🫵🏼🫵🏼</p>
+  </div>
+</section>
 
 <style>
-.mission-container {
-    display: flex;
-    justify-content: center;
-    padding: 3em 0;
+.mission-section {
+  max-width: 700px;
+  width: 92%;
+  margin: 32px auto 60px;
+  padding: 28px 32px;
+  background-color: rgba(0,0,0,0.7);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
-.mission-card {
-    background-color: rgba(0, 0, 0, 0.6);
-    color: #fff;
-    padding: 2.5em;
-    border-radius: 10px;
-    width: 50%;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    text-align: left;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+.mission-banner {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255,255,255,0.08);
+  display: block;
 }
 
-.mission-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+.mission-block { margin-bottom: 8px; }
+
+.mission-block h1 {
+  color: #cc1111;
+  font-size: 1.3em;
+  font-weight: 700;
+  margin: 0 0 10px;
+  letter-spacing: 0.3px;
 }
 
-.mission-card img {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    margin-bottom: 1.5em;
-    border: 3px solid #444;
+.mission-block p {
+  color: #ccc;
+  font-size: 0.97em;
+  line-height: 1.7;
+  margin: 0 0 8px;
 }
 
-.mission-card h1 {
-    color: #b40000;
-    font-size: 1.5em;
-    margin-bottom: 0.5em;
+.mission-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 20px 0;
 }
 
-.mission-card h2 {
-    color: #ddd;
-    font-size: 1.1em;
-    line-height: 1.6;
-    margin-bottom: 1em;
+.mission-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.mission-card ul {
-    list-style-type: square;
-    padding-left: 20px;
-    margin-bottom: 1.5em;
+.mission-list li {
+  color: #bbb;
+  font-size: 0.95em;
+  line-height: 1.5;
+  padding: 8px 14px;
+  background-color: rgba(255,255,255,0.03);
+  border-radius: 6px;
+  border-left: 2px solid rgba(204,17,17,0.4);
 }
 
-.mission-card ul li {
-    color: #ddd;
-    font-size: 1.1em;
-    margin-bottom: 0.5em;
+.mission-cta {
+  color: #888 !important;
+  font-style: italic;
+  margin-top: 16px !important;
 }
 
-@media screen and (max-width: 768px) {
-    .mission-card {
-        width: 90%;
-        padding: 1.5em;
-    }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 600px) {
+  .mission-section { padding: 20px 16px; }
 }
 </style>
-
 {% endblock %}

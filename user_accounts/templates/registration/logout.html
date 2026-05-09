@@ -1,2 +1,77 @@
-<h1>Çıkış yapıldı.</h1>
-<a href="{% url 'login' %}">Girişe git</a>
+{% extends 'layout.html' %}
+{% block content %}
+<div class="logout-container">
+  <div class="logout-card">
+    <div class="logout-icon">👋</div>
+    <h2>Çıkış Yapıldı</h2>
+    <p>Güvenli bir şekilde çıkış yaptınız. Görüşmek üzere!</p>
+    <div class="logout-buttons">
+      <a href="{% url 'user_accounts:login' %}" class="btn-primary">Tekrar Giriş Yap</a>
+      <a href="/" class="btn-secondary">Anasayfaya Git</a>
+    </div>
+  </div>
+</div>
+<style>
+.logout-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5em 1em;
+}
+.logout-card {
+  background-color: rgba(0,0,0,0.8);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 3em 3.5em;
+  text-align: center;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.logout-icon {
+  font-size: 3em;
+  margin-bottom: 0.5em;
+}
+.logout-card h2 {
+  color: #ffffff;
+  font-size: 1.8em;
+  font-weight: 700;
+  margin: 0 0 0.5em;
+}
+.logout-card p {
+  color: #888;
+  font-size: 0.95em;
+  margin: 0 0 2em;
+  line-height: 1.6;
+}
+.logout-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn-primary {
+  background-color: #cc1111;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95em;
+  transition: background-color 0.2s, transform 0.2s;
+}
+.btn-primary:hover { background-color: #e61414; transform: translateY(-2px); }
+.btn-secondary {
+  background-color: rgba(255,255,255,0.07);
+  color: #ccc;
+  text-decoration: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95em;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: background-color 0.2s, transform 0.2s;
+}
+.btn-secondary:hover { background-color: rgba(255,255,255,0.12); transform: translateY(-2px); color: #fff; }
+</style>
+{% endblock %}

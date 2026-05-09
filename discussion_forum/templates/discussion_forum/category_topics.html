@@ -65,167 +65,73 @@
         {% endif %}
     </section>
     <style>
-      summary {
-        font-size: 1.1em;
-        cursor: pointer;
-        background-color: #252525;
-        color: #ffffff;
-        padding: 15px 20px;
-        border-radius: 8px;
-        user-select: none;
-        transition: all 0.3s ease;
-        border-left: 4px solid #ff3333;
-        margin: 15px 0;
-    }
-    
-    summary:hover {
-        background-color: #333333;
-        transform: translateX(5px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    
     .category-detail-posts {
-        max-width: 1200px;
-        width: 100%;
-        margin: 30px auto 60px auto;
-        padding: 30px;
-        background-color: #1a1a1a;
-        border-radius: 12px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        animation: fadeIn 0.5s ease-out forwards;
+        max-width: 900px;
+        width: 92%;
+        margin: 24px auto 60px;
+        padding: 28px 32px;
+        background-color: rgba(0,0,0,0.7);
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.07);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        animation: fadeIn 0.4s ease-out forwards;
     }
-    
+
     .category-detail-posts h2 {
-        color: #ffffff;
-        font-size: 2.2em;
-        border-bottom: 3px solid #ff3333;
-        padding-bottom: 15px;
-        margin-bottom: 25px;
-        font-weight: 600;
-    }
-    
-    .category-detail-posts h3 {
-        color: #e6e6e6;
-        font-size: 1.6em;
-        border-bottom: 2px solid #ff3333;
+        color: #fff;
+        font-size: 1.8em;
+        border-bottom: 2px solid rgba(204,17,17,0.5);
         padding-bottom: 12px;
-        margin: 20px 0;
-    }
-    
-    .category-detail-posts ul {
-        list-style-type: none;
-        padding: 0;
-    }
-    
-    .category-detail-posts li {
-        background-color: #252525;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 15px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
-    
-    .category-detail-posts li:hover {
-        transform: translateX(5px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-    
-    .category-detail-posts a {
-        color: #ffffff;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-    
-    .category-detail-posts a:hover {
-        color: #ff3333;
-    }
-    
-    .category-detail-posts small {
-        color: #888;
-    }
-    
-    .category-no-post {
-        color: #999;
-        font-style: italic;
-        text-align: center;
-        padding: 2em;
-        background-color: #252525;
-        border-radius: 8px;
-        margin: 20px 0;
-    }
-    
-    .pagination {
-        margin: 30px 0;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-    }
-    
-    .pagination a, .pagination span {
-        color: #ffffff;
-        padding: 10px 20px;
-        text-decoration: none;
-        border: none;
-        border-radius: 6px;
-        background-color: #252525;
-        transition: all 0.3s ease;
-        font-weight: 500;
-    }
-    
-    .pagination a:hover {
-        background-color: #ff3333;
-        color: #ffffff;
-        transform: translateY(-2px);
-    }
-    
-    .pagination .current-page {
-        background-color: #ff3333;
-        color: white;
-    }
-    
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    /* Post içerik stilleri için ekstra özellikler */
-    ol {
-        padding: 0;
-        list-style: none;
-    }
-    
-    ol summary {
         margin-bottom: 20px;
+        font-weight: 700;
     }
-    
-    ol summary p {
-        margin: 10px 0;
+
+    .category-detail-posts h3 {
+        color: #ccc;
+        font-size: 1em;
+        font-weight: 400;
+        margin: 0 0 20px;
+        line-height: 1.6;
     }
-    
-    ol summary strong {
-        color: #ff3333;
+
+    .category-detail-posts ul, ol { list-style: none; padding: 0; margin: 0; }
+
+    summary {
+        display: block;
+        background-color: #1a1a1a;
+        color: #fff;
+        padding: 14px 18px;
+        border-radius: 10px;
+        border-left: 3px solid #cc1111;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
     }
-    
-    ol summary div {
-        color: #cecece;
-        margin: 10px 0;
-        line-height: 1.5;
+    summary:hover { background-color: #222; transform: translateX(4px); }
+    summary strong { color: #cc3333; }
+    summary div { color: #bbb; font-size: 0.9em; margin: 6px 0 0; line-height: 1.5; }
+    summary small { color: #555; font-size: 0.78em; }
+    summary a { color: #e0e0e0; text-decoration: none; }
+    summary a:hover { color: #ff5555; }
+
+    .category-no-post {
+        color: #666;
+        text-align: center;
+        padding: 3em;
+        background-color: #1a1a1a;
+        border-radius: 10px;
+        font-style: italic;
     }
-    
-    ol summary b i span {
-        transition: color 0.3s ease;
+
+    .pagination { margin: 24px 0; display: flex; justify-content: center; gap: 8px; }
+    .pagination a, .pagination span {
+        color: #aaa; padding: 8px 14px; text-decoration: none;
+        border: 1px solid #2a2a2a; border-radius: 7px;
+        background-color: #1a1a1a; font-size: 0.88em; transition: all 0.2s;
     }
-    
-    ol summary:hover b i span {
-        color: #ff5555;
-    }
+    .pagination a:hover { background-color: #cc1111; color: #fff; border-color: #cc1111; }
+    .pagination .current-page { background-color: #8b0000; color: white; border-color: #8b0000; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 {% endblock %}

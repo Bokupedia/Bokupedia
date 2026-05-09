@@ -1,191 +1,163 @@
 {% extends 'layout.html' %}
 {% block content %}
-<div class="edit-profile-container">
-    <h2>Profilinizi Güncelleyin</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="id_first_name">Ad:</label>
-            {{ form.first_name }}
-        </div>
-        <div class="form-group bio-group">
-          <label for="id_bio">Biyografi:</label>
-          {{ form.bio }}
-          <div class="bio-counter"><span id="current">0</span>/500 karakter</div>
-        </div>
-        <button type="submit" class="save-button">Kaydet</button>
-    </form>
+
+<div class="edit-profile-wrap">
+  <form method="post" enctype="multipart/form-data" class="edit-form">
+    {% csrf_token %}
+
+    <div class="form-header">
+      <h2>Profili Düzenle</h2>
+      <p>Bilgilerini güncelle</p>
+    </div>
+
+    <div class="form-group">
+      <label for="id_first_name">Ad</label>
+      {{ form.first_name }}
+    </div>
+
+    <div class="form-group bio-group">
+      <label for="id_bio">Biyografi</label>
+      {{ form.bio }}
+      <div class="bio-counter"><span id="current">0</span> / 500</div>
+    </div>
+
+    <button type="submit" class="save-btn">Kaydet</button>
+  </form>
 </div>
 
 <style>
+.edit-profile-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 32px 1em 60px;
+}
 
-/* Profil Güncelleme Konteyneri */
-.edit-profile-container {
-  background-color: rgba(0, 0, 0, 0.8);  /* sondaki opaklık değeri */
-  padding: 4em;
-  margin: 2em auto;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+.edit-form {
+  background-color: rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 32px 36px;
   width: 100%;
-  max-width: 600px;
-  text-align: center;
-}
-
-.edit-profile-container h2 {
-  font-size: 2em;
-  color:rgb(135, 0, 0);
-  margin-bottom: 1.5em;
-  font-weight: bold;
-}
-
-/* Form Stili */
-form {
+  max-width: 520px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
   display: flex;
   flex-direction: column;
-  gap: 1.5em;
+  gap: 20px;
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
-form label {
-  color: #ddd;
-  font-size: 1.1em;
-  font-weight: bold;
+.form-header { margin-bottom: 4px; }
+
+.form-header h2 {
+  color: #fff;
+  font-size: 1.7em;
+  font-weight: 800;
+  margin: 0 0 4px;
 }
 
-form input[type="text"],
-form input[type="email"],
-form input[type="file"],
-form input[type="password"],
-form textarea,
-form select {
-  width: 100%;
-  background-color: #1e1e1e;
-  color: #e0e0e0;
-  border: 1px solid #444;
-  border-radius: 5px;
-  padding: 0.8em;
-  font-size: 1em;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+.form-header p {
+  color: #555;
+  font-size: 0.88em;
+  margin: 0;
 }
 
-form input:focus,
-form textarea:focus,
-form select:focus {
-  outline: none;
-  border-color: #910000;
-  box-shadow: 0 0 8px #910000;
-}
-
-form input::placeholder,
-form textarea::placeholder {
-  color: #888;
-  font-style: italic;
-}
-
-.save-button {
-  background-color: #910000;
-  color: #181818;
-  border: none;
-  border-radius: 5px;
-  padding: 0.8em 1.5em;
-  font-size: 1.2em;
-  font-weight: bold;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.save-button:hover {
-  background-color: #910000;
-  transform: translateY(-2px);
-}
-
-.save-button:active {
-  background-color: #910000;
-  transform: translateY(0);
-}
-
-form input[type="file"] {
-  padding: 0.5em;
-  font-size: 0.9em;
-  color: #ccc;
-}
-
-@media (max-width: 768px) {
-  .edit-profile-container {
-    padding: 1.5em;
-  }
-
-  .edit-profile-container h2 {
-    font-size: 1.5em;
-  }
-
-  form {
-    gap: 1em;
-  }
-
-  .save-button {
-    font-size: 1em;
-    padding: 0.7em 1.2em;
-  }
-}
-
-.bio-group {
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   position: relative;
-  margin-bottom: 2em;
+}
+
+.edit-form label {
+  color: #aaa;
+  font-size: 0.82em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.edit-form input[type="text"],
+.edit-form input[type="email"],
+.edit-form input[type="file"],
+.edit-form textarea,
+.edit-form select {
+  width: 100%;
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.95em;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.edit-form input:focus,
+.edit-form textarea:focus {
+  outline: none;
+  border-color: #cc1111;
+  box-shadow: 0 0 0 3px rgba(204,17,17,0.12);
+  background-color: #1e1e1e;
+}
+
+.edit-form input::placeholder,
+.edit-form textarea::placeholder {
+  color: #555;
 }
 
 .bio-group textarea {
-  min-height: 200px !important;
-  font-size: 1.1em !important;
-  line-height: 1.6 !important;
-  padding: 1.2em !important;
-  background-color: #1e1e1e !important;
-  color: #e0e0e0 !important;
-  border: 2px solid #444 !important;
-  border-radius: 8px !important;
-  resize: vertical !important;
-  width: 100% !important;
-  transition: all 0.3s ease !important;
-}
-
-.bio-group textarea:focus {
-  border-color: #910000 !important;
-  box-shadow: 0 0 12px rgba(145, 0, 0, 0.3) !important;
-  background-color: #252525 !important;
+  min-height: 180px;
+  resize: vertical;
+  line-height: 1.6;
 }
 
 .bio-counter {
-  position: absolute;
-  bottom: -25px;
-  right: 10px;
-  color: #888;
-  font-size: 0.9em;
+  text-align: right;
+  color: #444;
+  font-size: 0.78em;
+  margin-top: 2px;
 }
 
-/* Karakter limiti yaklaştığında kırmızı gösterme */
-.bio-counter.near-limit {
-  color: #ff4444;
+.bio-counter.near-limit { color: #ff4444; }
+
+.save-btn {
+  background-color: #cc1111;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 0.95em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  margin-top: 4px;
+}
+
+.save-btn:hover { background-color: #e61414; transform: translateY(-1px); }
+.save-btn:active { background-color: #b30f0f; transform: translateY(1px); }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 560px) {
+  .edit-form { padding: 20px 16px; }
 }
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-      const bioTextarea = document.querySelector('#id_bio');
-      const counter = document.querySelector('.bio-counter span');
-      
-      function updateCounter() {
-          const currentLength = bioTextarea.value.length;
-          counter.textContent = currentLength;
-          
-          if (currentLength > 450) {
-              document.querySelector('.bio-counter').classList.add('near-limit');
-          } else {
-              document.querySelector('.bio-counter').classList.remove('near-limit');
-          }
-      }
-      
-      bioTextarea.addEventListener('input', updateCounter);
-      updateCounter();
-  });
+document.addEventListener('DOMContentLoaded', function() {
+  const bio = document.querySelector('#id_bio');
+  const counter = document.getElementById('current');
+  const counterEl = document.querySelector('.bio-counter');
+
+  function update() {
+    const len = bio.value.length;
+    counter.textContent = len;
+    counterEl.classList.toggle('near-limit', len > 450);
+  }
+
+  if (bio) { bio.addEventListener('input', update); update(); }
+});
 </script>
 {% endblock %}

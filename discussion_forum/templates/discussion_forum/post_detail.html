@@ -219,108 +219,52 @@
     
     <br><hr style="height: 2px; background-color: #ff3333; border: none;"><br>
 
-    <div class="haha-section">
-        <form method="post" style="display: inline; position: relative;">
-            {% csrf_token %}
-            <button type="submit" name="haha" class="haha-btn {% if user_hahas %}hahad{% endif %}">
-                <span class="haha-count">{{ hahas_count }}</span>
-                <span class="haha-emoji">😆</span>
-            </button>
-            
-            <div class="tooltip">
-                {% if post.hahas.all %}
-                    <strong>Haha</strong>
-                    <div class="tooltip-users">
-                        {% for haha in post.hahas.all %}
-                            <span class="tooltip-user">{{ haha.user.username }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-        </form>
-    </div>
-    
-    <div class="dislike-section">
-        <form method="post" style="display: inline; position: relative;">
-            {% csrf_token %}
-            <button type="submit" name="dislike" class="dislike-btn {% if user_dislikes %}disliked{% endif %}">
-                <span class="dislike-count">{{ dislikes_count }}</span>
-                <span class="dislike-emoji">👎</span>
-            </button>
-            
-            <div class="tooltip">
-                {% if post.dislikes.all %}
-                    <strong>Beğenmedim</strong>
-                    <div class="tooltip-users">
-                        {% for dislike in post.dislikes.all %}
-                            <span class="tooltip-user">{{ dislike.user.username }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-        </form>
-    </div>
-    
-      
-    <div class="angry-section">
-        <form method="post" style="display: inline; position: relative;">
-            {% csrf_token %}
-            <button type="submit" name="angry" class="angry-btn {% if user_angries %}angried{% endif %}">
-                <span class="angry-count">{{ angries_count }}</span>
-                <span class="angry-emoji">😡</span>
-            </button>
-            <div class="tooltip">
-                {% if post.angries.all %}
-                    <strong>Kızgın</strong>
-                    <div class="tooltip-users">
-                        {% for angry in post.angries.all %}
-                            <span class="tooltip-user">{{ angry.user.username }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-        </form>
-    </div>
-
-    
-    <div class="poop-section">
-        <form method="post" style="display: inline; position: relative;">
-            {% csrf_token %}
-            <button type="submit" name="poop" class="poop-btn {% if user_poops %}pooped{% endif %}">
-                <span class="poop-count">{{ poops_count }}</span>
-                <span class="poop-emoji">💩</span>
-            </button>
-            <div class="tooltip">
-                {% if post.poops.all %}
-                    <strong>Bok</strong>
-                    <div class="tooltip-users">
-                        {% for poop in post.poops.all %}
-                            <span class="tooltip-user">{{ poop.user.username }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-        </form>
-    </div>
-
-    <div class="nauseated-section">
-        <form method="post" style="display: inline; position: relative;">
-            {% csrf_token %}
-            <button type="submit" name="nauseated" class="nauseated-btn {% if user_nauseateds %}nauseated{% endif %}">
-                <span class="nauseated-count">{{ nauseateds_count }}</span>
-                <span class="nauseated-emoji">🤢</span>
-            </button>
-            <div class="tooltip">
-                {% if post.nauseateds.all %}
-                    <strong>Öğhh</strong>
-                    <div class="tooltip-users">
-                        {% for nauseated in post.nauseateds.all %}
-                            <span class="tooltip-user">{{ nauseated.user.username }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-        </form>
+    <div class="reactions-bar">
+        <div class="reaction-section haha-section">
+            <form method="post" style="display:inline;position:relative;">
+                {% csrf_token %}
+                <button type="submit" name="haha" class="reaction-btn {% if user_hahas %}active{% endif %}">
+                    <span class="reaction-emoji">😆</span><span class="reaction-count">{{ hahas_count }}</span>
+                </button>
+                <div class="tooltip">{% if post.hahas.all %}<strong>Haha</strong><div class="tooltip-users">{% for h in post.hahas.all %}<span class="tooltip-user">{{ h.user.username }}</span>{% endfor %}</div>{% endif %}</div>
+            </form>
+        </div>
+        <div class="reaction-section dislike-section">
+            <form method="post" style="display:inline;position:relative;">
+                {% csrf_token %}
+                <button type="submit" name="dislike" class="reaction-btn {% if user_dislikes %}active{% endif %}">
+                    <span class="reaction-emoji">👎</span><span class="reaction-count">{{ dislikes_count }}</span>
+                </button>
+                <div class="tooltip">{% if post.dislikes.all %}<strong>Beğenmedim</strong><div class="tooltip-users">{% for d in post.dislikes.all %}<span class="tooltip-user">{{ d.user.username }}</span>{% endfor %}</div>{% endif %}</div>
+            </form>
+        </div>
+        <div class="reaction-section angry-section">
+            <form method="post" style="display:inline;position:relative;">
+                {% csrf_token %}
+                <button type="submit" name="angry" class="reaction-btn {% if user_angries %}active{% endif %}">
+                    <span class="reaction-emoji">😡</span><span class="reaction-count">{{ angries_count }}</span>
+                </button>
+                <div class="tooltip">{% if post.angries.all %}<strong>Kızgın</strong><div class="tooltip-users">{% for a in post.angries.all %}<span class="tooltip-user">{{ a.user.username }}</span>{% endfor %}</div>{% endif %}</div>
+            </form>
+        </div>
+        <div class="reaction-section poop-section">
+            <form method="post" style="display:inline;position:relative;">
+                {% csrf_token %}
+                <button type="submit" name="poop" class="reaction-btn {% if user_poops %}active{% endif %}">
+                    <span class="reaction-emoji">💩</span><span class="reaction-count">{{ poops_count }}</span>
+                </button>
+                <div class="tooltip">{% if post.poops.all %}<strong>Bok</strong><div class="tooltip-users">{% for p in post.poops.all %}<span class="tooltip-user">{{ p.user.username }}</span>{% endfor %}</div>{% endif %}</div>
+            </form>
+        </div>
+        <div class="reaction-section nauseated-section">
+            <form method="post" style="display:inline;position:relative;">
+                {% csrf_token %}
+                <button type="submit" name="nauseated" class="reaction-btn {% if user_nauseateds %}active{% endif %}">
+                    <span class="reaction-emoji">🤢</span><span class="reaction-count">{{ nauseateds_count }}</span>
+                </button>
+                <div class="tooltip">{% if post.nauseateds.all %}<strong>Öğhh</strong><div class="tooltip-users">{% for n in post.nauseateds.all %}<span class="tooltip-user">{{ n.user.username }}</span>{% endfor %}</div>{% endif %}</div>
+            </form>
+        </div>
     </div>
     
     <h3>Yorumlar</h3>
@@ -410,46 +354,45 @@
 
 <style>
 
-    .haha-btn,
-    .dislike-btn,
-    .angry-btn,
-    .poop-btn,
-    .nauseated-btn {
-        background-color: #252525;
-        color: white;
-        border: 1px solid #3d3d3d;
-        padding: 8px 15px;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.3s ease;
+    .reactions-bar {
         display: flex;
-        align-items: center;
-        gap: 5px;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px 0;
     }
 
-    .haha-btn:hover,
-    .dislike-btn:hover,
-    .angry-btn:hover,
-    .poop-btn:hover,
-    .nauseated-btn:hover {
-        background-color:rgb(80, 80, 80);
-        transform: translateY(-2px);
-        border-color: #ff3333;
-    }
-
-    .haha-section, .dislike-section, .angry-section, .poop-section, .nauseated-section {
+    .reaction-section {
         display: inline-block;
         position: relative;
-        margin-right: 20px;
     }
 
-    .haha-count, .dislike-count, .angry-count, .poop-count, .nauseated-count {
-        font-size: 14px;
+    .reaction-btn {
+        background-color: #1e1e1e;
+        color: white;
+        border: 1px solid #333;
+        padding: 8px 14px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.9em;
     }
 
-    .haha-emoji, .dislike-emoji, .angry-emoji, .poop-emoji, .nauseated-emoji {
-        font-size: 18px; 
+    .reaction-btn:hover {
+        background-color: #2a2a2a;
+        border-color: #cc1111;
+        transform: translateY(-2px);
     }
+
+    .reaction-btn.active {
+        background-color: rgba(204,17,17,0.15);
+        border-color: #cc1111;
+    }
+
+    .reaction-emoji { font-size: 17px; }
+    .reaction-count { font-size: 13px; color: #bbb; font-weight: 600; }
 
     .tooltip {
         display: none;
@@ -511,8 +454,8 @@
     }
 
     .comment-header {
-        font-weight: bold;
-        color: #aeff00;
+        font-weight: 600;
+        color: #cc3333;
     }
 
     .comment-body {
@@ -786,18 +729,16 @@
     /* CKEditor */
     .ck.ck-editor {
         width: 100% !important;
-        max-width: 100%;
+        max-width: 100% !important;
         margin-bottom: 20px;
-        min-width: 1000px !important;
     }
 
     .ck.ck-editor__main > .ck-editor__editable {
-        min-height: 500px !important; /
-        max-height: 800px !important; 
-        min-width: 1000px !important;
-        padding: 2em !important; 
-        font-size: 16px !important; 
-        background:rgb(41, 41, 41);
+        min-height: 300px !important;
+        max-height: 800px !important;
+        padding: 1.5em !important;
+        font-size: 15px !important;
+        background: rgb(41,41,41);
     }
 
     .ck.ck-toolbar {

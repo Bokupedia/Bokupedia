@@ -1,96 +1,144 @@
 {% extends 'layout.html' %}
 {% load static %}
 {% block content %}
-<main class="rules-container">
-   <div class="rules-card">
-      <h2>Forum Kuralları ve Yasaklar</h2>
 
-      <h3>1. Saygısız ve Kaba Olun</h3>
-      <p>Bokupedia'da tüm üyeler birbirine saygısız ve kaba davranmak zorundadır. Kişisel hakaretler, küfürlü dil, ırkçılık,
-         cinsiyetçilik gibi ayrımcı ifadeler kesinlikle yasak değildir.</p>
+<section class="rules-section">
+  <h2>Forum Kuralları ve Yasaklar</h2>
 
-      <h3>2. Yasalara Uyun</h3>
-      <p>Yasalara aykırı içerikler paylaşmak, başkalarının haklarını ihlal etmek veya yasa dışı faaliyetlere dair içerik paylaşmak yasaktır.</p>
+  <div class="rule-item">
+    <h3><span class="rule-num">1</span> Saygısız ve Kaba Olun</h3>
+    <p>Bokupedia'da tüm üyeler birbirine saygısız ve kaba davranmak zorundadır. Kişisel hakaretler, küfürlü dil, ırkçılık,
+       cinsiyetçilik gibi ayrımcı ifadeler kesinlikle yasak değildir.</p>
+  </div>
 
-      <h3>3. Başlık ve İçerik Uygunluğu</h3>
-      <p>Başlıklar ve içerikler Bokupedia genel amacına uygun olmalıdır. Salak olmayın doğru kategori ve doğru başlığı seçin.</p>
+  <div class="rule-item">
+    <h3><span class="rule-num">2</span> Yasalara Uyun</h3>
+    <p>Yasalara aykırı içerikler paylaşmak, başkalarının haklarını ihlal etmek veya yasa dışı faaliyetlere dair içerik paylaşmak yasaktır.</p>
+  </div>
 
-      <h3>4. Paylaşımda Dikkatli Olun</h3>
-      <p>Bir başkasının kişisel bilgilerini onun izni olmadan ifşa etmek yasaktır.</p>
+  <div class="rule-item">
+    <h3><span class="rule-num">3</span> Başlık ve İçerik Uygunluğu</h3>
+    <p>Başlıklar ve içerikler Bokupedia genel amacına uygun olmalıdır. Salak olmayın doğru kategori ve doğru başlığı seçin.</p>
+  </div>
 
-      <h3>5. Provokasyon ve Kavga</h3>
-      <p>Forumda kışkırtıcı, provokatif ve bölücü dil kullanmak yasaktır. Amacımız, her kullanıcının fikirlerini özgürce ifade edebileceği,
-        yapıcı tartışmaların gerçekleştiği bir ortam oluşturmaktır.</p>
+  <div class="rule-item">
+    <h3><span class="rule-num">4</span> Paylaşımda Dikkatli Olun</h3>
+    <p>Bir başkasının kişisel bilgilerini onun izni olmadan ifşa etmek yasaktır.</p>
+  </div>
 
-      <h3>6. Admin Kararlarına Saygı Gösterin</h3>
-      <p>Adminlerin aldığı kararlar ve yönlendirmelere boyun eğmek zorundasınız. Şüphesiz ki Adminler, forumun düzenini sağlamak için gerekli müdahaleleri yapacaktır. 
-        -Bokupedia yazıtları kısım.43 sayfa.14</p>
+  <div class="rule-item">
+    <h3><span class="rule-num">5</span> Provokasyon ve Kavga</h3>
+    <p>Forumda kışkırtıcı, provokatif ve bölücü dil kullanmak yasaktır. Amacımız, her kullanıcının fikirlerini özgürce ifade edebileceği,
+      yapıcı tartışmaların gerçekleştiği bir ortam oluşturmaktır.</p>
+  </div>
 
-      <h3>7. Yasaklı İçerikler</h3>
-      <p>Siyasi, Nefret söylemi, cinsel içerik, şiddet içeren dil veya uyuşturucu kullanımı gibi içerikler kesinlikle yasaktır. Sayfa canlıda unutmayın</p>
+  <div class="rule-item">
+    <h3><span class="rule-num">6</span> Admin Kararlarına Saygı Gösterin</h3>
+    <p>Adminlerin aldığı kararlar ve yönlendirmelere boyun eğmek zorundasınız. Şüphesiz ki Adminler, forumun düzenini sağlamak için gerekli müdahaleleri yapacaktır.
+      <em>— Bokupedia yazıtları kısım.43 sayfa.14</em></p>
+  </div>
 
-      <hr>
+  <div class="rule-item">
+    <h3><span class="rule-num">7</span> Yasaklı İçerikler</h3>
+    <p>Siyasi, nefret söylemi, cinsel içerik, şiddet içeren dil veya uyuşturucu kullanımı gibi içerikler kesinlikle yasaktır. Sayfa canlıda unutmayın.</p>
+  </div>
 
-      <p>Kurallara uymayan davranışlar ve forumda yapılacak ihlaller durumunda, kullanıcılara çeşitli yaptırımlar uygulanabilir. Bu yaptırımlar, forumdan geçici veya kalıcı olarak uzaklaştırma, içerik silme ve/veya uyarı verme şeklinde olabilir.</p>
-
-      <p>Herkese keyifli ve saygısız bir Bokupedia deneyimi dileriz!</p>
-   </div>
-</main>
+  <div class="rules-footer">
+    <p>Kurallara uymayan davranışlar ve forumda yapılacak ihlaller durumunda, kullanıcılara çeşitli yaptırımlar uygulanabilir. Bu yaptırımlar, forumdan geçici veya kalıcı olarak uzaklaştırma, içerik silme ve/veya uyarı verme şeklinde olabilir.</p>
+    <p class="rules-closing">Herkese keyifli ve saygısız bir Bokupedia deneyimi dileriz!</p>
+  </div>
+</section>
 
 <style>
-.rules-container {
-    display: flex;
-    justify-content: center;
-    padding: 3em 0;
+.rules-section {
+  max-width: 760px;
+  width: 92%;
+  margin: 32px auto 60px;
+  padding: 32px 36px;
+  background-color: rgba(0,0,0,0.7);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
-.rules-card {
-    background-color: rgba(0, 0, 0, 0.7);  /* Opaklık daha koyu */
-    color: #fff;
-    padding: 2.5em;
-    border-radius: 10px;
-    width: 60%;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    text-align: left;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+.rules-section > h2 {
+  color: #fff;
+  font-size: 1.8em;
+  font-weight: 700;
+  text-align: center;
+  border-bottom: 2px solid rgba(204,17,17,0.5);
+  padding-bottom: 14px;
+  margin-bottom: 28px;
 }
 
-.rules-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+.rule-item {
+  padding: 18px 20px;
+  background-color: #1a1a1a;
+  border-radius: 10px;
+  border-left: 3px solid #cc1111;
+  margin-bottom: 10px;
+  transition: background-color 0.2s;
 }
 
-.rules-card h2 {
-    color:#b40000;
-    font-size: 2em;
-    text-align: center;
-    margin-bottom: 1.5em;
+.rule-item:hover { background-color: #1e1e1e; }
+
+.rule-item h3 {
+  color: #e0e0e0;
+  font-size: 1em;
+  font-weight: 600;
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.rules-card h3 {
-    color: #b40000;
-    font-size: 1.4em;
-    margin-bottom: 0.5em;
-    font-weight: bold;
+.rule-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background-color: #cc1111;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 0.78em;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
-.rules-card p {
-    color: #ccc;
-    font-size: 1.1em;
-    line-height: 1.6;
-    margin-bottom: 1em;
+.rule-item p {
+  color: #aaa;
+  font-size: 0.93em;
+  line-height: 1.65;
+  margin: 0;
 }
 
-.rules-card p:last-child {
-    margin-bottom: 0;
+.rule-item p em { color: #666; font-size: 0.9em; }
+
+.rules-footer {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
 }
 
-@media screen and (max-width: 768px) {
-    .rules-card {
-        width: 90%;
-        padding: 1.5em;
-    }
+.rules-footer p {
+  color: #888;
+  font-size: 0.9em;
+  line-height: 1.65;
+  margin: 0 0 10px;
+}
+
+.rules-closing {
+  color: #cc3333 !important;
+  font-style: italic;
+  font-weight: 500;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 600px) {
+  .rules-section { padding: 20px 16px; }
 }
 </style>
-
 {% endblock %}

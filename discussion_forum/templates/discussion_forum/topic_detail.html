@@ -3,241 +3,172 @@
 
 {% block content %}
 
+{% if topic.content|striptags|cut:" "|cut:"&nbsp;"|cut:"-" %}
+  <section class="topic-content-section">
+    <div class="topic-header-card">
+      <p class="topic-content-body">{{ topic.content|safe }}</p>
+    </div>
+  </section>
+{% endif %}
+
+<section class="topic-posts">
+  <h2>Gönderiler</h2>
+  <ul>
+    {% for post in posts %}
+    <li class="topic-post-card">
+      <div class="topic-post-meta">
+        <strong>{{ post.author.username }}</strong>
+        <span class="meta-date">{{ post.created_at|date:"d M Y H:i" }}</span>
+      </div>
+      <p class="topic-post-excerpt">{{ post.content|striptags|escape|truncatewords:10 }}</p>
+      <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}" class="read-more-link">Daha fazlası için tıkla →</a>
+    </li>
+    {% empty %}
+    <li class="topic-no-post">Bu kontent ile alakalı bir gönderi yok.</li>
+    {% endfor %}
+  </ul>
+
+  {% if posts.has_other_pages %}
+  <div class="pagination">
+    {% if posts.has_previous %}
+      <a href="?page={{ posts.previous_page_number }}" class="page-link">&laquo; Önceki</a>
+    {% endif %}
+    {% for num in posts.paginator.page_range %}
+      {% if posts.number == num %}
+        <span class="current-page">{{ num }}</span>
+      {% else %}
+        <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+    {% if posts.has_next %}
+      <a href="?page={{ posts.next_page_number }}" class="page-link">Sonraki &raquo;</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
+
 <style>
-  .red-underlined {
-    color: #ff3333;
-    text-decoration: none;
-    transition: all 0.3s ease;
+.topic-content-section {
+  max-width: 900px;
+  width: 92%;
+  margin: 24px auto 0;
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
-.red-underlined:hover {
-    color: #ff5555;
-    text-decoration: underline;
+.topic-header-card {
+  background-color: rgba(0,0,0,0.65);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-left: 3px solid #cc1111;
+  border-radius: 14px;
+  padding: 22px 28px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+}
+
+.topic-content-body {
+  color: #d0d0d0;
+  font-size: 1em;
+  line-height: 1.75;
+  margin: 0;
 }
 
 .topic-posts {
-    max-width: 1200px;
-    width: 90%;
-    margin: 30px auto 60px auto;
-    padding: 30px;
-    background-color: #1a1a1a;
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.5s ease-out forwards;
-}
-
-.topic-posts-left {
-  max-width: 1200px;
-  width: 80%;
-  margin: 30px auto 60px auto;
-  padding: 30px;
-  background-color: #1a1a1a;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  animation: fadeIn 0.5s ease-out forwards;
+  max-width: 900px;
+  width: 92%;
+  margin: 20px auto 60px;
+  padding: 28px 32px;
+  background-color: rgba(0,0,0,0.7);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
 .topic-posts h2 {
-    color: #ffffff;
-    font-size: 2.2em;
-    border-bottom: 3px solid #ff3333;
-    padding-bottom: 15px;
-    margin-bottom: 25px;
-    font-weight: 600;
+  color: #fff;
+  font-size: 1.8em;
+  font-weight: 700;
+  border-bottom: 2px solid rgba(204,17,17,0.5);
+  padding-bottom: 12px;
+  margin-bottom: 20px;
 }
 
 .topic-posts ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.topic-posts li {
-    background-color: #252525;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-
-.topic-posts li:hover {
-    transform: translateX(5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.topic-posts a {
-    color: #ffffff;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.topic-posts a:hover {
-    color: #ff3333;
-}
-
-.topic-posts small {
-    color: #888;
-}
-
-.pagination {
-    margin: 30px 0;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-}
-
-.pagination a, .pagination span {
-    color: #ffffff;
-    padding: 10px 20px;
-    text-decoration: none;
-    border: none;
-    border-radius: 6px;
-    background-color: #252525;
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.pagination a:hover {
-    background-color: #ff3333;
-    color: #ffffff;
-    transform: translateY(-2px);
-}
-
-.pagination .current-page {
-    background-color: #ff3333;
-    color: white;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .topic-post-card {
-    background-color: #252525;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    border-left: 4px solid #ff3333;
-    transition: all 0.3s ease;
+  background-color: #1a1a1a;
+  border-radius: 10px;
+  border-left: 3px solid #cc1111;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  transition: all 0.2s;
 }
 
 .topic-post-card:hover {
-    transform: translateX(5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  background-color: #202020;
+  transform: translateX(4px);
 }
 
-.topic-post-headers {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1.5em;
-    font-size: 1em;
-    color: #888;
+.topic-post-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
-.topic-post-headers p {
-    margin: 0;
+.topic-post-meta strong {
+  color: #cc3333;
+  font-size: 0.92em;
+  font-weight: 600;
 }
 
-.topic-post-headers strong {
-    color: #ff3333;
-    font-weight: 600;
+.meta-date {
+  color: #555;
+  font-size: 0.78em;
 }
 
-.topic-post-content {
-    font-size: 1.1em;
-    color: #e6e6e6;
-    line-height: 1.8;
-    margin: 15px 0;
+.topic-post-excerpt {
+  color: #bbb;
+  font-size: 0.93em;
+  line-height: 1.6;
+  margin: 0 0 10px;
 }
+
+.read-more-link {
+  display: inline-block;
+  color: #cc3333;
+  font-size: 0.82em;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.read-more-link:hover { color: #ff5555; }
 
 .topic-no-post {
-    color: #999;
-    font-style: italic;
-    text-align: center;
-    padding: 2em;
-    background-color: #252525;
-    border-radius: 8px;
-    margin: 20px 0;
+  color: #555;
+  font-style: italic;
+  text-align: center;
+  padding: 3em;
+  background-color: #1a1a1a;
+  border-radius: 10px;
 }
 
-.topic-header-left {
-    background-color: #252525;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    border-left: 4px solid #ff3333;
+.pagination { margin: 24px 0 0; display: flex; justify-content: center; gap: 8px; }
+.pagination a, .pagination span {
+  color: #aaa; padding: 8px 14px; text-decoration: none;
+  border: 1px solid #2a2a2a; border-radius: 7px;
+  background-color: #1a1a1a; font-size: 0.88em; transition: all 0.2s;
 }
+.pagination a:hover { background-color: #cc1111; color: #fff; border-color: #cc1111; }
+.pagination .current-page { background-color: #8b0000; color: white; border-color: #8b0000; }
 
-.topic-content-left {
-    color: #e6e6e6;
-    line-height: 1.8;
-    font-size: 1.1em;
-    margin: 0;
-    
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
-{% if  topic.content|striptags|cut:" "|cut:"&nbsp;"|cut:"-" %}
-<main>
-{% endif %}
-  {% if not topic.content|striptags|cut:" "|cut:"&nbsp;"|cut:"-" %}
-  {% else %}
-  <section class="topic-posts-left">
-    <div class="topic-header-left">
-      <p class="topic-content-left">{{ topic.content|safe }}</p>
-    </div>
-  </section>
-  {% endif %}
- <section class="topic-posts">
-   <h2>Gönderiler</h2>
-   <ul>
-     {% for post in posts %}
-     <li class="topic-post-card">
-        <div class="topic-post-headers">
-          <p><strong>{{ post.author.username }} tarafından {{ post.created_at|date:"d M Y H:i" }} tarihinde paylaşıldı.</strong></p>
-        </div>
-        <p class="topic-post-content">{{ post.content|striptags|escape|truncatewords:10 }}</p>
-
-        <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}">
-        <b><span style="color:#e50202;" class="red-underlined">Daha fazlası için tıkla...</span></b>
-        
-        </a>
-      </li>
-     {% empty %}
-     <li class="topic-no-post">Bu kontent ile alakalı bir gönderi yok.</li>
-     {% endfor %}
-   </ul>
-   <!-- Pagination -->
-   {% if posts.has_other_pages %}
-   <div class="pagination">
-       {% if posts.has_previous %}
-           <a href="?page={{ posts.previous_page_number }}" class="page-link">&laquo; Önceki</a>
-       {% endif %}
-
-       {% for num in posts.paginator.page_range %}
-           {% if posts.number == num %}
-               <span class="current-page">{{ num }}</span>
-           {% else %}
-               <a href="?page={{ num }}" class="page-link">{{ num }}</a>
-           {% endif %}
-       {% endfor %}
-
-       {% if posts.has_next %}
-           <a href="?page={{ posts.next_page_number }}" class="page-link">Sonraki &raquo;</a>
-       {% endif %}
-   </div>
-   {% endif %}
- </section>
-{% if  topic.content|striptags|cut:" "|cut:"&nbsp;"|cut:"-" %}
-</main>
-{% endif %}
 {% endblock %}
