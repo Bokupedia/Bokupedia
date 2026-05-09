@@ -4,7 +4,7 @@ from django_ckeditor_5.fields import CKEditor5Field
 from django.utils import timezone
 
 class User(AbstractUser):
-    last_activity = models.DateTimeField(default=timezone.now)
+    last_activity = models.DateTimeField(default=timezone.now, null=True, blank=True)
     bio = CKEditor5Field(
         config_name='default',
         blank=True
