@@ -112,18 +112,18 @@ def forum_index(request):
     if search_query:
         all_users = all_users.filter(username__icontains=search_query)
 
-    paginator = Paginator(all_posts, 20)
+    paginator = Paginator(all_posts, 10)
     page = request.GET.get('page', 1)
 
     total_users = User.objects.count()
     total_posts = Post.objects.count()
     total_categories = Category.objects.count()
-    
-    # Son 5 dakikada aktif olan kullanıcılar
-    active_time_threshold = timezone.now() - timedelta(minutes=5)
-    active_users = User.objects.filter(last_login__gte=active_time_threshold)
+    total_comments = Comment.objects.count()
 
-    active_users_names = [user.username for user in active_users]
+    # Son 5 dakikada aktif olan kullanıcılar (last_activity kullan)
+    active_time_threshold = timezone.now() - timedelta(minutes=5)
+    active_users_qs = User.objects.filter(last_activity__gte=active_time_threshold)
+    active_usernames = set(active_users_qs.values_list('username', flat=True))
 
     try:
         latest_posts = paginator.page(page)
@@ -136,13 +136,13 @@ def forum_index(request):
         'categories': categories,
         'latest_posts': latest_posts,
         'users': all_users,
+        'active_usernames': active_usernames,
         'stats': {
             'total_users': total_users,
             'total_posts': total_posts,
-            'total_categories': total_categories,
-            'active_users': ', '.join(active_users_names)
+            'total_comments': total_comments,
         }
-})
+    })
 
 @login_required
 def category_topics(request, category_id):

@@ -12,11 +12,28 @@
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Kullanıcı ara..." onkeyup="searchUsers()">
         </div>
+        {% if active_usernames %}
+        <div class="online-header">
+          <span class="online-pulse"></span>
+          <span class="online-label">Çevrimiçi — {{ active_usernames|length }}</span>
+        </div>
+        {% endif %}
         <div class="users-list">
             {% for user_item in users %}
-                <div class="user-item" data-username="{{ user_item.username|lower }}">
+                {% if user_item.username in active_usernames %}
+                <div class="user-item is-online" data-username="{{ user_item.username|lower }}">
+                    <span class="u-dot online"></span>
                     <a href="/accounts/profile/{{ user_item.username }}/" class="username">{{ user_item.username }}</a>
                 </div>
+                {% endif %}
+            {% endfor %}
+            {% for user_item in users %}
+                {% if user_item.username not in active_usernames %}
+                <div class="user-item" data-username="{{ user_item.username|lower }}">
+                    <span class="u-dot"></span>
+                    <a href="/accounts/profile/{{ user_item.username }}/" class="username">{{ user_item.username }}</a>
+                </div>
+                {% endif %}
             {% endfor %}
         </div>
     </div>
@@ -37,11 +54,16 @@
                   <span class="post-category">{{ post.category.name }}{% if post.topic %} / {{post.topic.title}}{% endif %}</span>
               </div>
               <div class="post-body">
-                  {{ post.content|striptags|escape|truncatewords:20 }}
+                  {{ post.content|safe }}
               </div>
+              {% if post.media_data %}
+              <div class="post-media">
+                  <img src="data:{{ post.media_type }};base64,{{ post.media_data }}" alt="" class="post-media-img">
+              </div>
+              {% endif %}
               <div class="post-footer">
                   <small class="post-date">{{ post.created_at|date:"d M Y H:i" }}</small>
-                  <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}" class="read-more">Daha fazlası için tıkla...</a>
+                  <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}" class="read-more">Yorumlar →</a>
               </div>
           </div>
       </li>
@@ -113,13 +135,11 @@
     {% endif %}
   </section>
 
-  <section class="stats-container">
+  <section class="stats-wrapper">
+  <div class="stats-container">
     <h2 class="section-header">Topluluk İstatistikleri</h2>
     <div class="stats-grid">
-      <div class="stat-item">
-        <h4>Çevrimiçi</h4>
-        <p>{{ stats.active_users }}</p>
-      </div>
+
       <div class="stat-item">
         <h4>Toplam Kullanıcı</h4>
         <p>{{ stats.total_users }}</p>
@@ -128,7 +148,13 @@
         <h4>Toplam Gönderi</h4>
         <p>{{ stats.total_posts }}</p>
       </div>
+      <div class="stat-item">
+        <h4>Toplam Yorum</h4>
+        <p>{{ stats.total_comments }}</p>
+      </div>
+
     </div>
+  </div>
   </section>
     {% else %}
     <main class="auth-container">
@@ -147,7 +173,17 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px 16px;
-    align-items: start;
+    align-items: start; /* grid row hizalama */
+}
+
+.users-container,
+.stats-wrapper {
+    align-self: stretch;
+}
+
+.stats-container {
+    position: sticky;
+    top: 44px;
 }
 
 .section-header {
@@ -190,17 +226,57 @@
 .users-list::-webkit-scrollbar-track { background: transparent; }
 .users-list::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 4px; }
 
+/* Online header */
+.online-header {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    background: rgba(34,197,94,0.07);
+    border: 1px solid rgba(34,197,94,0.15);
+    border-radius: 7px;
+}
+.online-pulse {
+    width: 8px; height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: pulse-green 2s infinite;
+}
+.online-label { color: #22c55e; font-size: 0.75em; font-weight: 700; letter-spacing: 0.4px; }
+
+/* User items */
 .user-item {
     background-color: #1a1a1a;
-    padding: 9px 12px;
+    padding: 8px 10px;
     border-radius: 7px;
-    margin-bottom: 6px;
-    border-left: 3px solid #cc1111;
-    transition: all 0.2s;
+    margin-bottom: 5px;
+    border-left: 3px solid #2a2a2a;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
-.user-item:hover { background-color: #222; border-left-color: #ff4444; }
-.username { color: #e0e0e0; text-decoration: none; font-size: 0.88em; font-weight: 500; }
+.user-item:hover { background-color: #222; border-left-color: #555; }
+.user-item.is-online { border-left-color: #22c55e; background-color: #111d14; }
+.user-item.is-online:hover { background-color: #152019; border-left-color: #4ade80; }
+
+.u-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #2a2a2a;
+    flex-shrink: 0;
+}
+.u-dot.online {
+    background: #22c55e;
+    box-shadow: 0 0 5px rgba(34,197,94,0.6);
+    animation: pulse-green 2s infinite;
+}
+
+.username { color: #ccc; text-decoration: none; font-size: 0.86em; font-weight: 500; }
 .username:hover { color: #fff; }
+.is-online .username { color: #e0e0e0; font-weight: 600; }
 
 /* Latest Posts Section */
 .latest-posts {
@@ -248,7 +324,14 @@
 .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .author-name { color: #ff4444; font-weight: 700; font-size: 0.9em; }
 .post-category { color: #666; font-size: 0.8em; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 10px; }
-.post-body { color: #ccc; margin: 8px 0; line-height: 1.6; font-size: 0.92em; }
+.post-body { color: #ccc; margin: 8px 0; line-height: 1.7; font-size: 0.92em; word-break: break-word; }
+.post-body img { max-width: 100%; border-radius: 7px; margin: 6px 0; }
+.post-body a { color: #7ab0d4; }
+.post-body p { margin: 4px 0; }
+.post-media { margin: 8px 0 4px; }
+.post-media-img { max-width: 100%; max-height: 400px; border-radius: 9px; border: 1px solid #222; object-fit: cover; }
+.feed-video { width: 100%; aspect-ratio: 16/9; border-radius: 9px; border: none; margin: 8px 0; }
+.post-body iframe { width: 100%; aspect-ratio: 16/9; border-radius: 9px; border: none; margin: 8px 0; }
 .post-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
 .post-date { color: #555; font-size: 0.78em; }
 .read-more { color: #cc3333; text-decoration: none; font-size: 0.82em; font-weight: 600; transition: color 0.2s; }
@@ -270,27 +353,79 @@
     background-color: #1a1a1a;
     padding: 12px 14px;
     border-radius: 9px;
-    border-left: 3px solid #8b0000;
+    border-left: 3px solid #2a2a2a;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 4px;
     transition: background-color 0.2s;
 }
 .stat-item:hover { background-color: #202020; }
+.stat-item.online-stat { border-left-color: #22c55e; background-color: #111d14; }
+.stat-item.online-stat:hover { background-color: #152019; }
+
 .stat-item h4 {
-    color: #666;
+    color: #555;
     margin: 0;
-    font-size: 0.72em;
+    font-size: 0.7em;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    font-weight: 600;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
-.stat-item p {
+.online-stat h4 { color: #4ade80; }
+.stat-pulse {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: pulse-green 2s infinite;
+}
+.stat-item p, .stat-num {
     color: #fff;
     font-size: 1.25em;
     font-weight: 800;
     margin: 0;
     word-break: break-all;
+}
+.online-stat .stat-num { color: #4ade80; }
+
+.online-names {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(34,197,94,0.15);
+    max-height: 160px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #2a2a2a transparent;
+}
+.online-name-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #a3e6b8;
+    font-size: 0.78em;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 3px 0;
+    transition: color 0.15s;
+}
+.online-name-chip:hover { color: #4ade80; }
+.chip-dot {
+    width: 6px; height: 6px;
+    background: #22c55e;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 4px rgba(34,197,94,0.5);
+}
+
+@keyframes pulse-green {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(34,197,94,0); }
 }
 
 /* Modal */
@@ -485,6 +620,16 @@
     }, 300);
   }
 
+
+  // Rumble embed dönüşümü
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.post-body').forEach(function(body) {
+      const regex = /https:\/\/rumble\.com\/embed\/[^\s<]+/g;
+      body.innerHTML = body.innerHTML.replace(regex, function(match) {
+        return `<iframe class="feed-video" src="${match}" frameborder="0" allowfullscreen></iframe>`;
+      });
+    });
+  });
 
   document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('post-media-upload');

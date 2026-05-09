@@ -142,6 +142,11 @@ def notification_list(request):
 # ── Poll (live badge + toast) ────────────────────────────────────
 @login_required
 def poll_notifications(request):
+    # Her poll'da last_activity güncelle → çevrimiçi takibi
+    from django.utils import timezone
+    request.user.last_activity = timezone.now()
+    request.user.save(update_fields=['last_activity'])
+
     last_id = int(request.GET.get('last_id', 0))
 
     new_notifs = (
