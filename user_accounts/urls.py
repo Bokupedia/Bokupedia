@@ -13,5 +13,5 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('edit-profile/', views.edit_profile, name='edit_profile'),
     path('<str:username>/posts/', views.profile_posts, name='profile_posts'),
-
+    path('password-change/', views.password_change, name='password_change'),
 ]

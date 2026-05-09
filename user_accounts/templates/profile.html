@@ -48,6 +48,9 @@
                     <a href="{% url 'user_accounts:edit_profile' %}" class="profile-button edit-button">
                         Profilini Düzenle
                     </a>
+                    <a href="{% url 'user_accounts:password_change' %}" class="profile-button password-button">
+                        Şifremi Değiştir
+                    </a>
                 {% endif %}
             </div>
         </div>
@@ -185,6 +188,14 @@
 
 .edit-button:hover {
     background-color: #555;
+}
+
+.password-button {
+    background-color: #1a3a5c;
+}
+
+.password-button:hover {
+    background-color: #1e4a78;
 }
 
 /* Mobil uyumluluk */

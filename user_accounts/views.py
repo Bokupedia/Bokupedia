@@ -1,7 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import User
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 from .forms import *
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -70,6 +71,18 @@ def custom_logout(request):
 def custom_login(request):
     form_class = CustomLoginForm
     template_name = 'registration/login.html'
+
+@login_required
+def password_change(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            logout(request)
+            return redirect('user_accounts:login')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'registration/password_change.html', {'form': form})
 
 @login_required
 def edit_profile(request):
