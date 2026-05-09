@@ -1,71 +1,33 @@
 {% extends 'layout.html' %}
 {% block content %}
 
-<script>
-    function searchContacts() {
-        const input = document.getElementById('searchInput');
-        if (!input) return;
-        const searchText = input.value.toLowerCase();
-        document.querySelectorAll('.contact-item').forEach(c => {
-            c.style.display = c.dataset.username.toLowerCase().includes(searchText) ? '' : 'none';
-        });
-    }
-
-    function sendMessage(e) {
-        e.preventDefault();
-        const input = document.getElementById('messageInput');
-        const messagesList = document.querySelector('.messages-list');
-        const selectedUserId = new URLSearchParams(window.location.search).get('contact');
-        const formData = new FormData();
-        formData.append('message', input.value);
-        formData.append('receiver_id', selectedUserId);
-        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
-
-        fetch('/messages/send/', { method: 'POST', body: formData })
-            .then(r => r.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    messagesList.insertAdjacentHTML('beforeend', `
-                        <div class="message-item sent">
-                            <div class="msg-meta"><span class="msg-author">${data.message.sender}</span><span class="msg-time">${data.message.timestamp}</span></div>
-                            <div class="msg-body">${data.message.content}</div>
-                        </div>
-                    `);
-                    input.value = '';
-                    messagesList.scrollTop = messagesList.scrollHeight;
-                }
-            })
-            .catch(err => console.error(err));
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) searchInput.addEventListener('input', searchContacts);
-
-        const messagesList = document.querySelector('.messages-list');
-        if (messagesList) messagesList.scrollTop = messagesList.scrollHeight;
-
-        const messageInput = document.getElementById('messageInput');
-        if (messageInput) {
-            messageInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(e); }
-            });
-        }
-    });
-</script>
-
 <section class="inbox-layout">
+
+  <!-- Contacts panel -->
   <div class="contacts-panel">
-    <h3 class="contacts-title">Bokupedialılar</h3>
+    <h3 class="contacts-title">Mesajlar</h3>
     <div class="contacts-search">
       <input type="text" id="searchInput" placeholder="Kişi ara…" autocomplete="off" />
     </div>
     <div class="contacts-list">
       {% for contact in contacts %}
         {% if contact != user %}
-          <div class="contact-item" data-username="{{ contact.username|lower }}">
+          <div class="contact-item {% if selected_user_id == contact.id|stringformat:'s' %}active{% endif %}"
+               data-username="{{ contact.username|lower }}">
             <a href="?contact={{ contact.id }}" class="contact-link">
-              <span class="contact-name">{{ contact.username }}</span>
+              <div class="contact-main">
+                <div class="contact-top">
+                  <span class="contact-name">{{ contact.username }}</span>
+                  {% if contact.last_msg_time %}
+                    <span class="contact-time">{{ contact.last_msg_time|date:"d M" }}</span>
+                  {% endif %}
+                </div>
+                {% if contact.last_msg_preview %}
+                  <div class="contact-preview">
+                    {% if contact.last_msg_is_mine %}<span class="preview-mine">Sen: </span>{% endif %}{{ contact.last_msg_preview }}
+                  </div>
+                {% endif %}
+              </div>
               {% if contact.unread_count > 0 %}
                 <span class="unread-badge">{{ contact.unread_count }}</span>
               {% endif %}
@@ -76,16 +38,21 @@
     </div>
   </div>
 
+  <!-- Chat panel -->
   <div class="chat-panel">
     {% if selected_user %}
+
       <div class="chat-header">
-        <span class="chat-with">{{ selected_user.username }}</span>
-        <span class="chat-subtitle">ile sohbet</span>
+        <div>
+          <span class="chat-with">{{ selected_user.username }}</span>
+          <a href="/accounts/profile/{{ selected_user.username }}/" class="chat-profile-link">profili gör →</a>
+        </div>
       </div>
 
-      <div class="messages-list">
+      <div class="messages-list" id="messagesList">
         {% for message in messages %}
-          <div class="message-item {% if message.sender == user %}sent{% else %}received{% endif %}">
+          <div class="message-item {% if message.sender == user %}sent{% else %}received{% endif %}"
+               data-id="{{ message.id }}">
             <div class="msg-meta">
               {% if message.sender == user %}
                 <span class="msg-author you">{{ message.sender.username }}</span>
@@ -93,16 +60,24 @@
                 <span class="msg-author">{{ message.sender.username }}</span>
               {% endif %}
               <span class="msg-time">{{ message.timestamp|date:"d M Y, H:i" }}</span>
+              {% if message.sender == user %}
+                <button class="msg-delete-btn" data-id="{{ message.id }}" title="Sil">✕</button>
+              {% endif %}
             </div>
             <div class="msg-body">{{ message.content|safe }}</div>
           </div>
         {% endfor %}
       </div>
 
-      <form method="post" class="message-compose" id="messageForm" onsubmit="sendMessage(event)">
+      <form method="post" class="message-compose" id="messageForm">
         {% csrf_token %}
-        <textarea name="message" id="messageInput" placeholder="Mesajınızı yazın… (Enter = gönder)" required></textarea>
-        <button type="submit">Gönder</button>
+        <textarea name="message" id="messageInput"
+                  placeholder="Mesajınızı yazın… (Enter = gönder, Shift+Enter = yeni satır)"
+                  required maxlength="2000"></textarea>
+        <div class="compose-footer">
+          <span class="char-counter" id="charCounter">0 / 2000</span>
+          <button type="submit" id="sendBtn">Gönder</button>
+        </div>
       </form>
 
     {% else %}
@@ -112,50 +87,178 @@
       </div>
     {% endif %}
   </div>
+
 </section>
+
+<script>
+const CSRF = '{{ csrf_token }}';
+const SELECTED_CONTACT = '{{ selected_user.id|default:"" }}';
+const CURRENT_USER = '{{ user.username }}';
+
+// ── Contact search ──────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.contact-item').forEach(el => {
+    el.style.display = el.dataset.username.includes(q) ? '' : 'none';
+  });
+});
+
+{% if selected_user %}
+// ── Scroll to bottom ────────────────────────────────────────────
+const msgList = document.getElementById('messagesList');
+function scrollBottom() { msgList.scrollTop = msgList.scrollHeight; }
+scrollBottom();
+
+// ── Send message ────────────────────────────────────────────────
+const form = document.getElementById('messageForm');
+const input = document.getElementById('messageInput');
+const charCounter = document.getElementById('charCounter');
+
+input.addEventListener('input', () => {
+  charCounter.textContent = `${input.value.length} / 2000`;
+  charCounter.style.color = input.value.length > 1800 ? '#ff5555' : '#444';
+});
+
+input.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitMessage(); }
+});
+
+form.addEventListener('submit', function(e) { e.preventDefault(); submitMessage(); });
+
+let lastId = {% if messages %}{{ messages.last.id|default:0 }}{% else %}0{% endif %};
+
+function submitMessage() {
+  const text = input.value.trim();
+  if (!text) return;
+
+  const sendBtn = document.getElementById('sendBtn');
+  sendBtn.disabled = true;
+
+  const fd = new FormData();
+  fd.append('message', text);
+  fd.append('receiver_id', SELECTED_CONTACT);
+  fd.append('csrfmiddlewaretoken', CSRF);
+
+  fetch('/messages/send/', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'success') {
+        appendMessage(data.message, true);
+        lastId = data.message.id;
+        input.value = '';
+        charCounter.textContent = '0 / 2000';
+      } else {
+        alert(data.message || 'Mesaj gönderilemedi.');
+      }
+    })
+    .catch(() => alert('Bir hata oluştu.'))
+    .finally(() => { sendBtn.disabled = false; });
+}
+
+function appendMessage(msg, scroll) {
+  const div = document.createElement('div');
+  div.className = `message-item ${msg.is_mine || msg.sender === CURRENT_USER ? 'sent' : 'received'}`;
+  div.dataset.id = msg.id;
+
+  const isMine = msg.sender === CURRENT_USER;
+  div.innerHTML = `
+    <div class="msg-meta">
+      <span class="msg-author ${isMine ? 'you' : ''}">${msg.sender}</span>
+      <span class="msg-time">${msg.timestamp}</span>
+      ${isMine ? `<button class="msg-delete-btn" data-id="${msg.id}" title="Sil">✕</button>` : ''}
+    </div>
+    <div class="msg-body">${msg.content}</div>
+  `;
+  msgList.appendChild(div);
+  if (scroll) scrollBottom();
+  bindDeleteBtn(div.querySelector('.msg-delete-btn'));
+}
+
+// ── Delete message ───────────────────────────────────────────────
+function bindDeleteBtn(btn) {
+  if (!btn) return;
+  btn.addEventListener('click', function() {
+    const id = this.dataset.id;
+    if (!confirm('Bu mesajı silmek istediğine emin misin?')) return;
+    fetch(`/messages/delete/${id}/`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': CSRF }
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'deleted') {
+        const item = document.querySelector(`.message-item[data-id="${id}"]`);
+        if (item) item.remove();
+      }
+    });
+  });
+}
+
+document.querySelectorAll('.msg-delete-btn').forEach(bindDeleteBtn);
+
+// ── Polling for new messages (every 5s) ──────────────────────────
+setInterval(() => {
+  fetch(`/messages/poll/?contact=${SELECTED_CONTACT}&last_id=${lastId}`)
+    .then(r => r.json())
+    .then(data => {
+      data.messages.forEach(msg => {
+        if (msg.id > lastId) {
+          lastId = msg.id;
+          appendMessage(msg, msg.is_mine);
+          // Auto-scroll only if near the bottom
+          const nearBottom = msgList.scrollHeight - msgList.scrollTop - msgList.clientHeight < 120;
+          if (nearBottom) scrollBottom();
+        }
+      });
+    })
+    .catch(() => {});
+}, 5000);
+
+{% endif %}
+</script>
 
 <style>
 .inbox-layout {
   display: flex;
   height: calc(100vh - 120px);
-  max-height: 760px;
+  max-height: 800px;
   width: 92%;
-  max-width: 1000px;
+  max-width: 1040px;
   margin: 24px auto 40px;
-  background-color: rgba(0,0,0,0.7);
+  background-color: rgba(0,0,0,0.72);
   border: 1px solid rgba(255,255,255,0.07);
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
   animation: fadeIn 0.4s ease-out forwards;
 }
 
-/* ── Contacts panel ── */
+/* ── Contacts ── */
 .contacts-panel {
-  width: 240px;
+  width: 260px;
   flex-shrink: 0;
   border-right: 1px solid rgba(255,255,255,0.06);
   display: flex;
   flex-direction: column;
-  background-color: rgba(0,0,0,0.3);
+  background-color: rgba(0,0,0,0.25);
 }
 
 .contacts-title {
-  color: #888;
-  font-size: 0.72em;
+  color: #777;
+  font-size: 0.7em;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  padding: 16px 16px 8px;
+  letter-spacing: 0.7px;
+  padding: 16px 14px 8px;
   margin: 0;
 }
 
-.contacts-search { padding: 0 10px 10px; }
+.contacts-search { padding: 0 10px 8px; }
 
 .contacts-search input {
   width: 100%;
-  background-color: #1a1a1a;
-  border: 1px solid #2a2a2a;
+  background-color: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 7px;
   padding: 7px 10px;
   font-size: 0.82em;
@@ -164,18 +267,20 @@
   transition: border-color 0.2s;
 }
 
-.contacts-search input:focus {
-  outline: none;
-  border-color: #cc1111;
-}
-
+.contacts-search input:focus { outline: none; border-color: #cc1111; }
 .contacts-search input::placeholder { color: #444; }
 
-.contacts-list { flex: 1; overflow-y: auto; padding: 4px 0; }
-.contacts-list::-webkit-scrollbar { width: 4px; }
+.contacts-list { flex: 1; overflow-y: auto; padding: 2px 0; }
+.contacts-list::-webkit-scrollbar { width: 3px; }
 .contacts-list::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
 
 .contact-item { padding: 1px 8px; }
+
+.contact-item.active .contact-link {
+  background-color: rgba(204,17,17,0.15);
+  border-left: 2px solid #cc1111;
+  padding-left: 8px;
+}
 
 .contact-link {
   display: flex;
@@ -183,24 +288,48 @@
   align-items: center;
   padding: 9px 10px;
   border-radius: 8px;
+  border-left: 2px solid transparent;
   text-decoration: none;
-  color: #bbb;
-  font-size: 0.88em;
-  transition: all 0.15s;
+  transition: background-color 0.15s;
+  gap: 8px;
 }
 
-.contact-link:hover { background-color: rgba(255,255,255,0.06); color: #fff; }
+.contact-link:hover { background-color: rgba(255,255,255,0.05); }
+
+.contact-main { flex: 1; min-width: 0; }
+
+.contact-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.contact-name { color: #d0d0d0; font-size: 0.87em; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.contact-time { color: #444; font-size: 0.7em; white-space: nowrap; flex-shrink: 0; }
+
+.contact-preview {
+  color: #555;
+  font-size: 0.74em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.preview-mine { color: #666; }
 
 .unread-badge {
   background-color: #cc1111;
   color: #fff;
   border-radius: 10px;
   padding: 1px 7px;
-  font-size: 0.75em;
+  font-size: 0.72em;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
-/* ── Chat panel ── */
+/* ── Chat ── */
 .chat-panel {
   flex: 1;
   display: flex;
@@ -209,15 +338,22 @@
 }
 
 .chat-header {
-  padding: 16px 20px 14px;
+  padding: 14px 20px 12px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
   display: flex;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.chat-with { color: #fff; font-weight: 700; font-size: 1em; }
-.chat-subtitle { color: #555; font-size: 0.82em; }
+.chat-with { color: #fff; font-weight: 700; font-size: 1em; margin-right: 10px; }
+
+.chat-profile-link {
+  color: #555;
+  font-size: 0.75em;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.chat-profile-link:hover { color: #cc3333; }
 
 .messages-list {
   flex: 1;
@@ -225,64 +361,80 @@
   padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .messages-list::-webkit-scrollbar { width: 5px; }
 .messages-list::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
 
 .message-item {
-  max-width: 70%;
-  padding: 10px 14px;
+  max-width: 68%;
+  padding: 9px 13px;
   border-radius: 12px;
   word-wrap: break-word;
 }
 
 .message-item.sent {
   align-self: flex-end;
-  background-color: rgba(100,20,20,0.5);
+  background-color: rgba(120,15,15,0.45);
   border: 1px solid rgba(204,17,17,0.2);
 }
 
 .message-item.received {
   align-self: flex-start;
   background-color: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.07);
 }
 
 .msg-meta {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 5px;
+  flex-wrap: wrap;
 }
 
-.msg-author { color: #cc3333; font-size: 0.78em; font-weight: 600; }
-.msg-author.you { color: #cc3333; }
-.msg-time { color: #444; font-size: 0.73em; white-space: nowrap; }
-.msg-body { color: #d0d0d0; font-size: 0.9em; line-height: 1.5; }
+.msg-author { color: #cc4444; font-size: 0.76em; font-weight: 600; }
+.msg-author.you { color: #cc4444; }
+.msg-time { color: #3a3a3a; font-size: 0.71em; white-space: nowrap; margin-left: auto; }
 
+.msg-delete-btn {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 0.75em;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+.msg-delete-btn:hover { color: #cc3333; }
+
+.msg-body { color: #d0d0d0; font-size: 0.9em; line-height: 1.55; }
+
+/* ── Compose ── */
 .message-compose {
-  padding: 12px 16px;
+  padding: 10px 14px 12px;
   border-top: 1px solid rgba(255,255,255,0.06);
   display: flex;
-  gap: 10px;
-  align-items: flex-end;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .message-compose textarea {
-  flex: 1;
-  background-color: #1a1a1a;
+  width: 100%;
+  background-color: rgba(255,255,255,0.04);
   color: #e0e0e0;
-  border: 1px solid #2a2a2a;
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 8px;
   padding: 9px 12px;
   font-size: 0.88em;
   resize: none;
-  min-height: 38px;
-  max-height: 120px;
+  min-height: 42px;
+  max-height: 110px;
   line-height: 1.5;
+  box-sizing: border-box;
   transition: border-color 0.2s;
 }
 
@@ -291,30 +443,39 @@
   border-color: #cc1111;
 }
 
-.message-compose textarea::placeholder { color: #444; }
+.message-compose textarea::placeholder { color: #3a3a3a; }
+
+.compose-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.char-counter { color: #444; font-size: 0.73em; }
 
 .message-compose button {
   background-color: #cc1111;
   color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 9px 18px;
+  border-radius: 7px;
+  padding: 7px 20px;
   font-size: 0.85em;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: background-color 0.2s;
-  white-space: nowrap;
 }
 
 .message-compose button:hover { background-color: #e61414; }
+.message-compose button:disabled { background-color: #555; cursor: not-allowed; }
 
+/* ── Empty state ── */
 .chat-empty {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #444;
+  color: #3a3a3a;
   font-size: 0.9em;
   gap: 8px;
 }
@@ -324,9 +485,11 @@
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 640px) {
-  .inbox-layout { flex-direction: column; height: auto; max-height: none; }
-  .contacts-panel { width: 100%; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); max-height: 200px; }
-  .chat-panel { min-height: 400px; }
+  .inbox-layout { flex-direction: column; height: auto; max-height: none; border-radius: 0; margin: 0; }
+  .contacts-panel { width: 100%; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); max-height: 220px; }
+  .chat-panel { min-height: 420px; }
+  .message-item { max-width: 85%; }
 }
 </style>
+
 {% endblock %}
