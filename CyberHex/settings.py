@@ -165,3 +165,8 @@ AUTH_USER_MODEL = 'user_accounts.User'
 LOGIN_REDIRECT_URL = "/"
 
 LOGOUT_REDIRECT_URL = "/"
+
+if os.environ.get('DJANGO_DEV'):
+    DEBUG = True
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
