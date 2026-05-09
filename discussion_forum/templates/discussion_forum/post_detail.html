@@ -1,6 +1,12 @@
 {% extends 'layout.html' %}
 {% load static %}
 
+{% block extra_head %}
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/translations/tr.js"></script>
+<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/theme.css">
+{% endblock %}
+
 {% block content %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
