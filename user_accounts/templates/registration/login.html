@@ -3,6 +3,7 @@
   <form method="post" class="login-form">
     {% csrf_token %} {{ form.as_p }}
     <button type="submit" class="login-button">Giriş Yap</button>
+    <a href="{% url 'user_accounts:password_reset' %}" class="forgot-link">Şifremi unuttum</a>
   </form>
 </div>
 <style>
@@ -87,6 +88,20 @@
     transform: translateY(1px);
   }
   
+  .forgot-link {
+    display: block;
+    text-align: center;
+    color: #888;
+    font-size: 0.9rem;
+    text-decoration: none;
+    margin-top: -0.5em;
+    transition: color 0.2s ease;
+  }
+
+  .forgot-link:hover {
+    color: #cc1111;
+  }
+
   .error-message {
     color: #ff4444;
     font-size: 0.9rem;
