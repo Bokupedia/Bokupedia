@@ -41,17 +41,13 @@
               <li>
                 <a href="{% url 'notifications:notification_list' %}">
                   Bildirimlerim
-                  {% if unread_count > 0 %}
-                    <span class="unread-badge">{{ unread_count }}</span>
-                  {% endif %}
+                  <span class="unread-badge" id="notif-badge" style="{% if not unread_count %}display:none{% endif %}">{{ unread_count|default:"" }}</span>
                 </a>
               </li>
               <li>
                 <a href="{% url 'private_messages:inbox' %}">
                     Mesajlarım
-                    {% if unread_messages_count > 0 %}
-                        <span class="unread-badge">{{ unread_messages_count }}</span>
-                    {% endif %}
+                    <span class="unread-badge" id="msg-badge" style="{% if not unread_messages_count %}display:none{% endif %}">{{ unread_messages_count|default:"" }}</span>
                 </a>
               </li>
               <li><a href="{% url 'post_interactions:profile_posts' %}">Gönderilerim</a></li>
@@ -77,7 +73,9 @@
       <div class="text"></div>
 
     </header>
-    {% block content %} {% endblock %}
+    <div class="page-content">
+      {% block content %}{% endblock %}
+    </div>
     <footer>
       <div class="footer-container">
         <p>© 2024 Bokupedia. Tüm hakları saklıdır ama çalan olursa sorun yok biz de Wikipedia'dan çalmıştık zaten.</p>
@@ -132,26 +130,187 @@
       }
         
     </script>
+    {% if user.is_authenticated %}
+    <!-- Notification toast -->
+    <div id="notif-toast" style="display:none">
+      <div class="toast-icon" id="toast-icon">🔔</div>
+      <div class="toast-body">
+        <p class="toast-msg" id="toast-msg"></p>
+        <span class="toast-time" id="toast-time"></span>
+      </div>
+      <div class="toast-actions">
+        <a href="{% url 'notifications:notification_list' %}" class="toast-link">Gör →</a>
+        <button class="toast-close" id="toast-close">✕</button>
+      </div>
+    </div>
+
+    <script>
+    (function() {
+      const NOTIF_URL = '/notifications/poll/';
+      const LS_KEY = 'boku_last_notif_id';
+
+      let lastId = parseInt(localStorage.getItem(LS_KEY) || '0');
+      let toastTimer = null;
+      let isFirstPoll = (lastId === 0);
+
+      function updateBadge(id, count) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (count > 0) {
+          el.textContent = count;
+          el.style.display = '';
+        } else {
+          el.style.display = 'none';
+        }
+      }
+
+      function showToast(notif) {
+        const toast = document.getElementById('notif-toast');
+        document.getElementById('toast-icon').textContent = notif.icon;
+        document.getElementById('toast-msg').textContent = notif.message;
+        document.getElementById('toast-time').textContent = notif.created_at;
+        toast.style.display = 'flex';
+        toast.classList.remove('toast-hiding');
+        toast.classList.add('toast-visible');
+
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(dismissToast, 6000);
+      }
+
+      function dismissToast() {
+        const toast = document.getElementById('notif-toast');
+        toast.classList.add('toast-hiding');
+        setTimeout(() => { toast.style.display = 'none'; toast.classList.remove('toast-hiding', 'toast-visible'); }, 350);
+      }
+
+      document.getElementById('toast-close').addEventListener('click', dismissToast);
+
+      async function poll() {
+        try {
+          const res = await fetch(`${NOTIF_URL}?last_id=${lastId}`);
+          if (!res.ok) return;
+          const data = await res.json();
+
+          updateBadge('notif-badge', data.unread_count);
+          updateBadge('msg-badge', data.unread_messages_count);
+
+          if (!isFirstPoll && data.new_notifications.length > 0) {
+            showToast(data.new_notifications[0]);
+          }
+
+          if (data.latest_id > lastId) {
+            lastId = data.latest_id;
+            localStorage.setItem(LS_KEY, lastId);
+          }
+          isFirstPoll = false;
+        } catch(e) {}
+      }
+
+      poll();
+      setInterval(poll, 15000);
+    })();
+    </script>
+    {% endif %}
+
     <style>
         .unread-badge {
-          background-color: red;
+          background-color: #cc1111;
           color: white;
-          border-radius: 50%;
-          padding: 3px 8px;
-          font-size: 14px;
+          border-radius: 10px;
+          padding: 2px 7px;
+          font-size: 11px;
+          font-weight: 700;
           margin-left: 5px;
-        } 
+          vertical-align: middle;
+        }
 
         .text {
           font-size: 18px;
           font-weight: bold;
-          color:rgb(82, 82, 82);
+          color: rgb(82, 82, 82);
           text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
           text-align: center;
           margin-top: 10px;
         }
-        
-        
+
+        /* Toast */
+        #notif-toast {
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          z-index: 9999;
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          background-color: #1a1a1a;
+          border: 1px solid rgba(255,255,255,0.1);
+          border-left: 3px solid #cc1111;
+          border-radius: 12px;
+          padding: 14px 16px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+          max-width: 340px;
+          min-width: 260px;
+          animation: toastIn 0.3s ease-out;
+        }
+
+        #notif-toast.toast-hiding {
+          animation: toastOut 0.35s ease-in forwards;
+        }
+
+        .toast-icon { font-size: 1.4em; flex-shrink: 0; margin-top: 1px; }
+
+        .toast-body { flex: 1; min-width: 0; }
+
+        .toast-msg {
+          color: #e0e0e0;
+          font-size: 0.87em;
+          line-height: 1.45;
+          margin: 0 0 3px;
+          word-break: break-word;
+        }
+
+        .toast-time {
+          color: #555;
+          font-size: 0.74em;
+        }
+
+        .toast-actions {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 6px;
+          flex-shrink: 0;
+        }
+
+        .toast-link {
+          color: #cc3333;
+          font-size: 0.78em;
+          font-weight: 700;
+          text-decoration: none;
+          white-space: nowrap;
+        }
+        .toast-link:hover { color: #ff5555; }
+
+        .toast-close {
+          background: none;
+          border: none;
+          color: #444;
+          font-size: 0.82em;
+          cursor: pointer;
+          padding: 0;
+          line-height: 1;
+          transition: color 0.15s;
+        }
+        .toast-close:hover { color: #cc3333; }
+
+        @keyframes toastIn {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes toastOut {
+          from { opacity: 1; transform: translateY(0); }
+          to   { opacity: 0; transform: translateY(16px); }
+        }
     </style>
   </body>
 </html>

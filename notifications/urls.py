@@ -5,9 +5,9 @@ app_name = 'notifications'
 
 urlpatterns = [
     path('', views.notification_list, name='notification_list'),
+    path('poll/', views.poll_notifications, name='poll_notifications'),
     path('<int:notification_id>/mark-read/', views.mark_notification_read, name='mark_notification_read'),
     path('<int:notification_id>/delete/', views.delete_notification, name='delete_notification'),
     path('mark-all-read/', views.mark_all_read, name='mark_all_read'),
     path('delete-all/', views.delete_all_notifications, name='delete_all_notifications'),
-
 ]

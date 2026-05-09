@@ -1,174 +1,45 @@
 {% extends 'layout.html' %}
 {% load static %}
-
 {% block content %}
-<nav class="profile-post-container">
-    <header>
-        <h2 class="topic-posts-header">Gönderilerim</h2>
-    </header>
-    <ul>
-        {% for post in posts %}
-            <li class="topic-post-card">
-                    <div class="profile-post-details">
-                        <h2>Başlık: {{ post.category.name }}{% if post.topic %} / {{post.topic}}{% endif %}</h2>
-                        <p class="topic-post-content">İçerik: {{ post.content|striptags|escape|truncatewords:7}}</p> 
-                        <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}" class="red-underlined">Gönderime git</a>
-                    </div>
-            </li>
-        {% empty %}
-            <li class="topic-no-post">Gönderi bulunamadı.</li>
-        {% endfor %}
-    </ul>
 
-    <!-- Pagination Eklendi -->
-    {% if posts.has_other_pages %}
-        <div class="pagination">
-            {% if posts.has_previous %}
-                <a href="?page={{ posts.previous_page_number }}" class="page-link">&laquo; Önceki</a>
-            {% endif %}
+<section class="posts-section">
+  <h2 class="posts-title">Gönderilerim</h2>
 
-            {% for num in posts.paginator.page_range %}
-                {% if posts.number == num %}
-                    <span class="current-page">{{ num }}</span>
-                {% else %}
-                    <a href="?page={{ num }}" class="page-link">{{ num }}</a>
-                {% endif %}
-            {% endfor %}
-
-            {% if posts.has_next %}
-                <a href="?page={{ posts.next_page_number }}" class="page-link">Sonraki &raquo;</a>
-            {% endif %}
+  <ul class="posts-list">
+    {% for post in posts %}
+      <li class="post-card">
+        <div class="post-card-meta">
+          <span class="post-card-category">
+            {{ post.category.name }}{% if post.topic %} <span class="meta-sep">/</span> {{ post.topic }}{% endif %}
+          </span>
+          <span class="post-card-date">{{ post.created_at|date:"d M Y" }}</span>
         </div>
+        <p class="post-card-excerpt">{{ post.content|striptags|escape|truncatewords:15 }}</p>
+        <a href="{% url 'discussion_forum:post_detail' post_id=post.id %}" class="post-card-link">Gönderime git →</a>
+      </li>
+    {% empty %}
+      <li class="posts-empty">Henüz hiç gönderi yok.</li>
+    {% endfor %}
+  </ul>
+
+  {% if posts.has_other_pages %}
+  <div class="pagination">
+    {% if posts.has_previous %}
+      <a href="?page={{ posts.previous_page_number }}" class="page-link">&laquo; Önceki</a>
     {% endif %}
+    {% for num in posts.paginator.page_range %}
+      {% if posts.number == num %}
+        <span class="current-page">{{ num }}</span>
+      {% else %}
+        <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+    {% if posts.has_next %}
+      <a href="?page={{ posts.next_page_number }}" class="page-link">Sonraki &raquo;</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
 
-    <style>
-        .profile-post-container {
-            background-color: rgba(0, 0, 0, 0.6);
-            padding: 20px;
-            margin: 15px auto;
-            border-radius: 8px;
-            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgb(48, 48, 48);
-            max-width: 1300px;
-        }
-
-        .topic-posts-header {
-            color: #ff3333;
-            font-size: 2.2em;
-            border-bottom: 3px solid #ff3333;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-            font-weight: 600;
-        }
-
-        .profile-posts {
-            max-width: 1200px;
-            width: 100%;
-            margin: 30px auto 60px;
-            padding: 20px;
-            background-color: rgb(31, 31, 31);
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(37, 37, 37, 0.1);
-        }
-
-        .profile-posts h2 {
-            color: #cab7b7;
-            border-bottom: 2px solid #5e0000;
-            padding-bottom: 10px;
-        }
-
-        .profile-post-details {
-            background-color: #1d1d1d;
-            padding: 15px;
-            margin-top: 10px;
-            border-radius: 5px;
-        }
-
-        .profile-post-details p {
-            color: whitesmoke;
-            font-size: 1em;
-            line-height: 1.6;
-        }
-
-        .profile-post-details a {
-            display: inline-block;
-            margin-top: 3px;
-            color: #ff3333;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .profile-post-details a:hover {
-            color: #ff5555;
-            text-decoration: underline;
-        }
-
-        /* Pagination */
-        .pagination {
-            margin: 20px 0;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .pagination a, .pagination span {
-            color: #ffffff;
-            padding: 10px 20px;
-            text-decoration: none;
-            border: 1px solid #2d2d2d;
-            border-radius: 6px;
-            background-color: #252525;
-            transition: background-color 0.3s ease;
-        }
-
-        .pagination a:hover {
-            background-color: #ff3333;
-            color: #ffffff;
-            transform: translateY(-2px);
-        }
-
-        .pagination .current-page {
-            background-color: #ff3333;
-            color: white;
-        }
-
-        /* Additional styling */
-        .topic-post-card {
-            background-color: #252525;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            border-left: 4px solid #ff3333;
-            transition: all 0.3s ease;
-        }
-
-        .topic-post-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .topic-no-post {
-            color: #999;
-            font-style: italic;
-            text-align: center;
-            padding: 2em;
-            background-color: #252525;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
-</nav>
+{% include 'profile_posts_style.html' %}
 {% endblock %}

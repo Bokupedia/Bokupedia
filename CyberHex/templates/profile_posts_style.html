@@ -1,0 +1,104 @@
+<style>
+.posts-section {
+  max-width: 860px;
+  width: 92%;
+  margin: 28px auto 60px;
+  padding: 28px 32px;
+  background-color: rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.posts-title {
+  color: #fff;
+  font-size: 1.8em;
+  font-weight: 700;
+  border-bottom: 2px solid rgba(204,17,17,0.5);
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.posts-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.post-card {
+  background-color: #1a1a1a;
+  border-radius: 10px;
+  border-left: 3px solid #cc1111;
+  padding: 14px 18px;
+  transition: background-color 0.2s;
+}
+
+.post-card:hover { background-color: #202020; }
+
+.post-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.post-card-category {
+  color: #cc3333;
+  font-size: 0.83em;
+  font-weight: 600;
+}
+
+.meta-sep { color: #444; }
+
+.post-card-date {
+  color: #444;
+  font-size: 0.76em;
+  white-space: nowrap;
+}
+
+.post-card-excerpt {
+  color: #aaa;
+  font-size: 0.92em;
+  line-height: 1.6;
+  margin: 0 0 10px;
+}
+
+.post-card-link {
+  color: #cc3333;
+  text-decoration: none;
+  font-size: 0.82em;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+.post-card-link:hover { color: #ff5555; }
+
+.posts-empty {
+  color: #444;
+  font-style: italic;
+  text-align: center;
+  padding: 3em;
+  background-color: #1a1a1a;
+  border-radius: 10px;
+}
+
+.pagination { margin: 24px 0 0; display: flex; justify-content: center; gap: 8px; }
+.pagination a, .pagination span {
+  color: #aaa; padding: 8px 14px; text-decoration: none;
+  border: 1px solid #2a2a2a; border-radius: 7px;
+  background-color: #1a1a1a; font-size: 0.88em; transition: all 0.2s;
+}
+.pagination a:hover { background-color: #cc1111; color: #fff; border-color: #cc1111; }
+.pagination .current-page { background-color: #8b0000; color: #fff; border-color: #8b0000; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 600px) {
+  .posts-section { padding: 18px 14px; }
+}
+</style>

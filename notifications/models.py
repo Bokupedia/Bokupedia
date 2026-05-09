@@ -17,7 +17,8 @@ class Notification(models.Model):
             ('nauseated', 'Nauseated'),
             ('comment', 'Comment'),
             ('dislike', 'Dislike'),
-            ('message', 'Message')
+            ('message', 'Message'),
+            ('comment_edit', 'Comment Edit'),
         ],
         default='unknown'
     )

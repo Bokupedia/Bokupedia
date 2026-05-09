@@ -13,21 +13,17 @@
             {% for notification in notifications %}
                 <li class="notification-item {% if not notification.read %}unread{% endif %}">
                     <div class="notification-content">
-                        {% if notification.notification_type == 'haha' %}
-                            😆 {{ notification.message|safe }}
-                        {% elif notification.notification_type == 'comment' %}
-                            💬 {{ notification.message|safe }}
-                        {% elif notification.notification_type == 'dislike' %}
-                            👎 {{ notification.message|safe }}
-                        {% elif notification.notification_type == 'angry' %}
-                            😡 {{ notification.message|safe }}
-                        {% elif notification.notification_type == 'poop' %}
-                            💩 {{ notification.message|safe }}
-                        {% elif notification.notification_type == 'nauseated' %}
-                            🤢 {{ notification.message|safe }}
-                        {% elif notification.notification_type == 'message' %}
-                            📩 {{ notification.message|safe }}
+                        {% if notification.notification_type == 'haha' %}😆
+                        {% elif notification.notification_type == 'comment' %}💬
+                        {% elif notification.notification_type == 'dislike' %}👎
+                        {% elif notification.notification_type == 'angry' %}😡
+                        {% elif notification.notification_type == 'poop' %}💩
+                        {% elif notification.notification_type == 'nauseated' %}🤢
+                        {% elif notification.notification_type == 'message' %}📩
+                        {% elif notification.notification_type == 'comment_edit' %}✏️
+                        {% else %}🔔
                         {% endif %}
+                        {{ notification.message|safe }}
                         <small class="notification-date">
                             {{ notification.created_at|date:"d M Y H:i" }}
                         </small>
@@ -83,25 +79,19 @@
         });
 
         document.getElementById('delete-all-btn').addEventListener('click', function() {
-            const userConfirmed = confirm("Tüm bildirimleri silmek istediğinize emin misiniz?");
-            if (userConfirmed) {
-                fetch('/notifications/delete-all/', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                    }
-                }).then(response => response.json())
-                  .then(data => {
-                      if (data.status === 'deleted_all') {
-                          document.querySelectorAll('.notification-item').forEach(item => {
-                              item.remove();
-                          });
-                      } else {
-                          alert("Bildirimler silinemedi.");
-                      }
-                  });
-            }
-            location.reload();
+            if (!confirm("Tüm bildirimleri silmek istediğinize emin misiniz?")) return;
+            fetch('/notifications/delete-all/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'deleted_all') {
+                    location.reload();
+                } else {
+                    alert("Bildirimler silinemedi.");
+                }
+            });
         });
         
        document.querySelectorAll('.view-post-btn').forEach(button => {

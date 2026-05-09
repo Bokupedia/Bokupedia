@@ -12,890 +12,575 @@
             });
         }
     });
-    
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Her yorum için medya yükleme işleyicisini ekle
         document.querySelectorAll('[id^="edit-media-upload-"]').forEach(function(input) {
             const commentId = input.id.split('-').pop();
             const previewDiv = document.getElementById(`edit-media-preview-${commentId}`);
-            
             input.addEventListener('change', function(e) {
                 const file = this.files[0];
                 if (!file) return;
-                
                 if (file.size > 5 * 1024 * 1024) {
                     alert('Dosya boyutu 5MB\'dan küçük olmalıdır');
                     this.value = '';
                     previewDiv.innerHTML = '';
                     return;
                 }
-                
-                previewDiv.innerHTML = `
-                    <div class="file-info">
-                        <i class="fas fa-image"></i>
-                        <span class="file-name">${file.name}</span>
-                        <button type="button" class="remove-file">×</button>
-                    </div>`;
-                
-                const removeButton = previewDiv.querySelector('.remove-file');
-                removeButton.addEventListener('click', function() {
+                previewDiv.innerHTML = `<div class="fi"><span class="fn">${file.name}</span><button type="button" class="rf">×</button></div>`;
+                previewDiv.querySelector('.rf').addEventListener('click', function() {
                     input.value = '';
                     previewDiv.innerHTML = '';
                 });
             });
         });
     });
-    
+
     function removeExistingCommentMedia(commentId) {
         document.getElementById(`remove-media-${commentId}`).value = 'true';
         document.getElementById(`edit-media-preview-${commentId}`).innerHTML = '';
     }
-    
+
     function validateForm() {
         const commentContent = document.getElementById("comment_content").value.trim();
         const mediaUpload = document.getElementById("media-upload").files.length;
-    
-        if (commentContent !== "" || mediaUpload > 0) {
-            return true; 
-        }
-    
+        if (commentContent !== "" || mediaUpload > 0) return true;
         alert("Yorum yazmalı veya medya yüklemelisiniz!");
-        return false; 
+        return false;
     }
-    
-    let editor;
 
+    let editor;
     document.addEventListener('DOMContentLoaded', function () {
         ClassicEditor
             .create(document.querySelector('#editor'), {
-                'toolbar': [
-                    
-                    'bold', 'italic',
-                    '|',
-                    'bulletedList', 'numberedList',
-                    '|', 
-                    'link',
-                    '|',
-                    'undo', 'redo',
-                    '|',
-                ],
+                toolbar: ['bold', 'italic', '|', 'bulletedList', 'numberedList', '|', 'link', '|', 'undo', 'redo'],
             })
-            .then(newEditor => {
-                editor = newEditor;
-            })
-            .catch(error => {
-                console.error(error);
-            });
+            .then(newEditor => { editor = newEditor; })
+            .catch(error => { console.error(error); });
     });
-    
 
     function showPostEditForm() {
         document.getElementById('edit-post-form').style.display = 'block';
-        if (editor) {
-            editor.setData(`{{ post.content|safe|escapejs }}`);
-        }
+        if (editor) editor.setData(`{{ post.content|safe|escapejs }}`);
     }
-
     function hidePostEditForm() {
         document.getElementById('edit-post-form').style.display = 'none';
     }
-
     function saveContent() {
-        const content = editor.getData();
-        document.getElementById('edited-content').value = content;
+        document.getElementById('edited-content').value = editor.getData();
     }
 
     document.addEventListener('DOMContentLoaded', function() {
         const editFileInput = document.getElementById('edit-media-upload');
         const editPreviewDiv = document.getElementById('edit-media-preview');
-        
         editFileInput.addEventListener('change', function(e) {
             const file = this.files[0];
             if (!file) return;
-            
             if (file.size > 5 * 1024 * 1024) {
                 alert('Dosya boyutu 5MB\'dan küçük olmalıdır');
                 this.value = '';
                 editPreviewDiv.innerHTML = '';
                 return;
             }
-            
-            editPreviewDiv.innerHTML = `
-                <div class="file-info">
-                    <i class="fas fa-image"></i>
-                    <span class="file-name">${file.name}</span>
-                    <button type="button" class="remove-file">×</button>
-                </div>`;
-            
-            const removeButton = editPreviewDiv.querySelector('.remove-file');
-            removeButton.addEventListener('click', function() {
+            editPreviewDiv.innerHTML = `<div class="fi"><span class="fn">${file.name}</span><button type="button" class="rf">×</button></div>`;
+            editPreviewDiv.querySelector('.rf').addEventListener('click', function() {
                 editFileInput.value = '';
                 editPreviewDiv.innerHTML = '';
             });
         });
     });
-    
+
     function removeExistingMedia() {
         document.getElementById('remove-media').value = 'true';
         document.getElementById('edit-media-preview').innerHTML = '';
     }
 </script>
 
-<div class="post-details-topic">
-    <h2 class="post-details-topic-header">{{ post.title }}</h2>
-    <div class="post-details-post-header">
-        <div class="post-author-section">
-            <h2>
-                Yazar:
-                <a href="/accounts/profile/{{post.author.username}}">
-                    <strong style="color:hsla(79, 100.00%, 50.00%, 0.80)"><u style="color:hsla(79, 100.00%, 50.00%, 0.80)">{{post.author}}</u></strong>
-                </a>
-            </h2>
-            <h2>
-            {% if post.category %}
-                    <strong>Kategoriye Git ➡   </strong> 
-                    <a href="{% url 'discussion_forum:category_topics' category_id=post.category.id %}" style="color: #ff5555;">
-                        {{post.category.name}}
-                    </a>
-            {% endif %}
-            </h2> 
-            {% if post.author == request.user or request.user.is_staff %}
-                <div class="post-actions">
-                    <button class="edit-post-btn" onclick="showPostEditForm()">Gönderiyi Düzenle</button>
-                    <form method="post" class="delete-post-form">
-                        {% csrf_token %}
-                        <button type="submit" name="delete_post" class="delete-post-btn" onclick="return confirm('Bu gönderiyi silmek istediğinizden emin misiniz?')">Gönderiyi Sil</button>
-                    </form>
-                </div>
-        
-                <form method="post" id="edit-post-form" class="edit-form" style="display: none;" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div id="editor"></div>
-                    <input type="hidden" name="edited_post_content" id="edited-content">
-                    
-                    <div class="media-upload">
-                        <input type="file" name="edited_media" id="edit-media-upload" accept="image/*" style="display: none;">
-                        <label for="edit-media-upload" class="media-upload-btn">
-                            <i class="fas fa-image"></i> Resim/Gif Değiştir
-                        </label>
-                        <div id="edit-media-preview">
-                            {% if post.media_data %}
-                                <div class="file-info">
-                                    <i class="fas fa-image"></i>
-                                    <span class="file-name">Mevcut medya</span>
-                                    <button type="button" class="remove-file" onclick="removeExistingMedia()">×</button>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <input type="hidden" name="remove_media" id="remove-media" value="false">
-                    
-                    <div class="form-buttons">
-                        <button type="submit" name="edit_post" class="submit-post-btn" onclick="saveContent()">Kaydet</button>
-                        <button type="button" onclick="hidePostEditForm()" class="cancel-btn">İptal</button>
-                    </div>
-                </form>
-            {% endif %}
-        </div>
-        <div class="post-date-section">
-            <h2><strong>Oluşturulma Tarihi:</strong> {{ post.created_at }}</h2>
-        </div>
-    </div>
-    
-    
-    <hr style="height: 2px; background-color: #ff3333; border: none;">
-    <section class="post-details-content">
-        {{ post.content|safe }}
-        
-        {% if post.media_data %}
-            <div class="post-media">
-                <img src="data:{{ post.media_type }};base64,{{ post.media_data }}" 
-                     alt="Post media" 
-                     class="post-media-image">
-            </div>
-        {% endif %}
-    </section>
-    
-    <br><hr style="height: 2px; background-color: #ff3333; border: none;"><br>
+<div class="pd-layout">
 
-    <div class="reactions-bar">
-        <div class="reaction-section haha-section">
-            <form method="post" style="display:inline;position:relative;">
-                {% csrf_token %}
-                <button type="submit" name="haha" class="reaction-btn {% if user_hahas %}active{% endif %}">
-                    <span class="reaction-emoji">😆</span><span class="reaction-count">{{ hahas_count }}</span>
-                </button>
-                <div class="tooltip">{% if post.hahas.all %}<strong>Haha</strong><div class="tooltip-users">{% for h in post.hahas.all %}<span class="tooltip-user">{{ h.user.username }}</span>{% endfor %}</div>{% endif %}</div>
-            </form>
-        </div>
-        <div class="reaction-section dislike-section">
-            <form method="post" style="display:inline;position:relative;">
-                {% csrf_token %}
-                <button type="submit" name="dislike" class="reaction-btn {% if user_dislikes %}active{% endif %}">
-                    <span class="reaction-emoji">👎</span><span class="reaction-count">{{ dislikes_count }}</span>
-                </button>
-                <div class="tooltip">{% if post.dislikes.all %}<strong>Beğenmedim</strong><div class="tooltip-users">{% for d in post.dislikes.all %}<span class="tooltip-user">{{ d.user.username }}</span>{% endfor %}</div>{% endif %}</div>
-            </form>
-        </div>
-        <div class="reaction-section angry-section">
-            <form method="post" style="display:inline;position:relative;">
-                {% csrf_token %}
-                <button type="submit" name="angry" class="reaction-btn {% if user_angries %}active{% endif %}">
-                    <span class="reaction-emoji">😡</span><span class="reaction-count">{{ angries_count }}</span>
-                </button>
-                <div class="tooltip">{% if post.angries.all %}<strong>Kızgın</strong><div class="tooltip-users">{% for a in post.angries.all %}<span class="tooltip-user">{{ a.user.username }}</span>{% endfor %}</div>{% endif %}</div>
-            </form>
-        </div>
-        <div class="reaction-section poop-section">
-            <form method="post" style="display:inline;position:relative;">
-                {% csrf_token %}
-                <button type="submit" name="poop" class="reaction-btn {% if user_poops %}active{% endif %}">
-                    <span class="reaction-emoji">💩</span><span class="reaction-count">{{ poops_count }}</span>
-                </button>
-                <div class="tooltip">{% if post.poops.all %}<strong>Bok</strong><div class="tooltip-users">{% for p in post.poops.all %}<span class="tooltip-user">{{ p.user.username }}</span>{% endfor %}</div>{% endif %}</div>
-            </form>
-        </div>
-        <div class="reaction-section nauseated-section">
-            <form method="post" style="display:inline;position:relative;">
-                {% csrf_token %}
-                <button type="submit" name="nauseated" class="reaction-btn {% if user_nauseateds %}active{% endif %}">
-                    <span class="reaction-emoji">🤢</span><span class="reaction-count">{{ nauseateds_count }}</span>
-                </button>
-                <div class="tooltip">{% if post.nauseateds.all %}<strong>Öğhh</strong><div class="tooltip-users">{% for n in post.nauseateds.all %}<span class="tooltip-user">{{ n.user.username }}</span>{% endfor %}</div>{% endif %}</div>
-            </form>
-        </div>
-    </div>
-    
-    <h3>Yorumlar</h3>
-    {% if comments %}
-        {% for comment in comments %}
-            <div class="comment">
-                <div class="comment-header">
-                    <strong>{{ comment.author }}</strong> -
-                    <span>{{ comment.created_at }}</span>
-                </div>
-                <div class="comment-body">
-                    <p>
-                        {{ comment.content|safe|urlize }}
-                    </p>
-                    {% if comment.media_data %}
-                        <img src="data:{{ comment.media_type }};base64,{{ comment.media_data }}" 
-                            alt="Comment media" 
-                            style="max-width: 500px; max-height: 500px;">
-                    {% endif %}
-                    {% if request.user == comment.author or request.user.is_staff %}
-                        <div class="comment-actions">
-                            <button class="edit-comment-btn" onclick="showEditForm({{ comment.id }})">Düzenle</button>
-                            <form method="post" style="display: inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="comment_id" value="{{ comment.id }}">
-                                <button type="submit" name="delete_comment" class="delete-comment-btn" 
-                                        onclick="return confirm('Bu yorumu silmek istediğinizden emin misiniz?')">Sil</button>
-                            </form>
-                        </div>
-                        
-                        <!-- Yorum Duzenleme -->
-                        <form method="post" id="edit-form-{{ comment.id }}" class="edit-comment-form" style="display: none;" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <input type="hidden" name="comment_id" value="{{ comment.id }}">
-                            <div class="edit-comment-textarea-container">
-                                <textarea name="edited_content" class="edit-comment-textarea">{{ comment.content|safe }}</textarea>
-                            </div>
-                            
-                            <div class="edit-comment-media-upload">
-                                <input type="file" name="edited_media" id="edit-media-upload-{{ comment.id }}" accept="image/*" style="display: none;">
-                                <label for="edit-media-upload-{{ comment.id }}" class="edit-comment-media-btn">
-                                    <i class="fas fa-image"></i> Resim/Gif Değiştir
-                                </label>
-                                <div id="edit-media-preview-{{ comment.id }}">
-                                    {% if comment.media_data %}
-                                        <div class="edit-comment-file-info">
-                                            <i class="fas fa-image"></i>
-                                            <span class="edit-comment-file-name">Mevcut medya</span>
-                                            <button type="button" class="edit-comment-remove-file" onclick="removeExistingCommentMedia({{ comment.id }})">×</button>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <input type="hidden" name="remove_media" id="remove-media-{{ comment.id }}" value="false">
-                            
-                            <div class="edit-comment-buttons">
-                                <button type="submit" name="edit_comment" class="edit-comment-save-btn">Kaydet</button>
-                                <button type="button" onclick="hideEditForm({{ comment.id }})" class="edit-comment-cancel-btn">İptal</button>
-                            </div>
-                        </form>
-                    {% endif %}
-                </div>
-            </div>
-        {% endfor %}
-    {% else %}
-        <h4>Henüz yorum yapılmamış.</h4>
-    {% endif %}
-    
+  <!-- ══════════════ LEFT: Post ══════════════ -->
+  <article class="pd-post">
 
-    <!-- Yorum Formu -->
-    <form method="post" class="comment-form" enctype="multipart/form-data" onsubmit="return validateForm()">
-        {% csrf_token %}
-        <textarea name="comment_content" id="comment_content" class="custom-textarea" placeholder="Yorumunuzu yazın..."></textarea>
-        
-        <div class="media-upload">
-            <input type="file" name="media" id="media-upload" accept="image/*" style="display: none;">
-            <label for="media-upload" class="media-upload-btn">
-                <i class="fas fa-image"></i> Resim/Gif Ekle
-            </label>
-            <div id="media-preview"></div>
-        </div>        
-        
-        <button type="submit" name="comment" class="submit-comment-btn">Yorum Yap</button>
+    <!-- top bar: category tag + date -->
+    <div class="pd-topbar">
+      {% if post.category %}
+        <a href="{% url 'discussion_forum:category_topics' category_id=post.category.id %}" class="pd-cat-tag">{{ post.category.name }}</a>
+      {% endif %}
+      <span class="pd-date">{{ post.created_at|date:"d M Y  ·  H:i" }}</span>
+    </div>
+
+    <!-- author + owner actions -->
+    <div class="pd-author-row">
+      <div class="pd-author-info">
+        <span class="pd-author-dot"></span>
+        <a href="/accounts/profile/{{ post.author.username }}/" class="pd-author">{{ post.author }}</a>
+      </div>
+      {% if post.author == request.user or request.user.is_staff %}
+      <div class="pd-owner-btns">
+        <button class="pdb edit" onclick="showPostEditForm()">Düzenle</button>
+        <form method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" name="delete_post" class="pdb danger"
+                  onclick="return confirm('Bu gönderiyi silmek istediğinizden emin misiniz?')">Sil</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- edit form -->
+    {% if post.author == request.user or request.user.is_staff %}
+    <form method="post" id="edit-post-form" class="pd-edit-form" style="display:none;" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div id="editor"></div>
+      <input type="hidden" name="edited_post_content" id="edited-content">
+      <div class="pd-upload-row">
+        <input type="file" name="edited_media" id="edit-media-upload" accept="image/*" style="display:none;">
+        <label for="edit-media-upload" class="pd-upload">📎 Resim Değiştir</label>
+        <div id="edit-media-preview">
+          {% if post.media_data %}<div class="fi"><span class="fn">Mevcut medya</span><button type="button" class="rf" onclick="removeExistingMedia()">×</button></div>{% endif %}
+        </div>
+      </div>
+      <input type="hidden" name="remove_media" id="remove-media" value="false">
+      <div class="pd-form-row">
+        <button type="submit" name="edit_post" class="pdb primary" onclick="saveContent()">Kaydet</button>
+        <button type="button" class="pdb secondary" onclick="hidePostEditForm()">İptal</button>
+      </div>
     </form>
+    {% endif %}
+
+    <!-- content -->
+    <div class="pd-divider"></div>
+    <section class="post-details-content">
+      {{ post.content|safe }}
+      {% if post.media_data %}
+        <div class="pd-media">
+          <img src="data:{{ post.media_type }};base64,{{ post.media_data }}" alt="" class="pd-media-img">
+        </div>
+      {% endif %}
+    </section>
+
+    <!-- reactions -->
+    <div class="pd-divider"></div>
+    <div class="pd-reactions">
+      <div class="rx haha-s">
+        <form method="post">{% csrf_token %}
+          <button type="submit" name="haha" class="rx-pill {% if user_hahas %}on{% endif %}">
+            <span>😆</span><span class="rx-n">{{ hahas_count }}</span>
+          </button>
+          <div class="rx-tip">{% if post.hahas.all %}<b>Haha</b>{% for h in post.hahas.all %}<i>{{ h.user.username }}</i>{% endfor %}{% endif %}</div>
+        </form>
+      </div>
+      <div class="rx dislike-s">
+        <form method="post">{% csrf_token %}
+          <button type="submit" name="dislike" class="rx-pill {% if user_dislikes %}on{% endif %}">
+            <span>👎</span><span class="rx-n">{{ dislikes_count }}</span>
+          </button>
+          <div class="rx-tip">{% if post.dislikes.all %}<b>Beğenmedim</b>{% for d in post.dislikes.all %}<i>{{ d.user.username }}</i>{% endfor %}{% endif %}</div>
+        </form>
+      </div>
+      <div class="rx angry-s">
+        <form method="post">{% csrf_token %}
+          <button type="submit" name="angry" class="rx-pill {% if user_angries %}on{% endif %}">
+            <span>😡</span><span class="rx-n">{{ angries_count }}</span>
+          </button>
+          <div class="rx-tip">{% if post.angries.all %}<b>Kızgın</b>{% for a in post.angries.all %}<i>{{ a.user.username }}</i>{% endfor %}{% endif %}</div>
+        </form>
+      </div>
+      <div class="rx poop-s">
+        <form method="post">{% csrf_token %}
+          <button type="submit" name="poop" class="rx-pill {% if user_poops %}on{% endif %}">
+            <span>💩</span><span class="rx-n">{{ poops_count }}</span>
+          </button>
+          <div class="rx-tip">{% if post.poops.all %}<b>Bok</b>{% for p in post.poops.all %}<i>{{ p.user.username }}</i>{% endfor %}{% endif %}</div>
+        </form>
+      </div>
+      <div class="rx nausea-s">
+        <form method="post">{% csrf_token %}
+          <button type="submit" name="nauseated" class="rx-pill {% if user_nauseateds %}on{% endif %}">
+            <span>🤢</span><span class="rx-n">{{ nauseateds_count }}</span>
+          </button>
+          <div class="rx-tip">{% if post.nauseateds.all %}<b>Öğhh</b>{% for n in post.nauseateds.all %}<i>{{ n.user.username }}</i>{% endfor %}{% endif %}</div>
+        </form>
+      </div>
+    </div>
+
+  </article>
+
+  <!-- ══════════════ RIGHT: Comments sidebar ══════════════ -->
+  <aside class="pd-sidebar">
+
+    <div class="pd-sidebar-head">
+      <span class="pd-sidebar-title">Yorumlar</span>
+      {% if comments %}<span class="pd-sidebar-badge">{{ comments|length }}</span>{% endif %}
+    </div>
+
+    <div class="pd-comments-scroll">
+      {% for comment in comments %}
+      <div class="pd-comment">
+        <div class="pd-cm-header">
+          <span class="pd-cm-author">{{ comment.author }}</span>
+          <span class="pd-cm-date">{{ comment.created_at|date:"d M, H:i" }}</span>
+        </div>
+        <div class="pd-cm-body">
+          {{ comment.content|safe|urlize }}
+          {% if comment.media_data %}
+            <img src="data:{{ comment.media_type }};base64,{{ comment.media_data }}" alt="" class="pd-cm-img">
+          {% endif %}
+        </div>
+        {% if request.user == comment.author or request.user.is_staff %}
+        <div class="pd-cm-actions">
+          <button class="pdb edit xs" onclick="showEditForm({{ comment.id }})">Düzenle</button>
+          <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="comment_id" value="{{ comment.id }}">
+            <button type="submit" name="delete_comment" class="pdb danger xs"
+                    onclick="return confirm('Bu yorumu silmek istediğinizden emin misiniz?')">Sil</button>
+          </form>
+        </div>
+        <form method="post" id="edit-form-{{ comment.id }}" class="pd-edit-form" style="display:none;" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="comment_id" value="{{ comment.id }}">
+          <textarea name="edited_content" class="pd-ta sm">{{ comment.content|safe }}</textarea>
+          <div class="pd-upload-row">
+            <input type="file" name="edited_media" id="edit-media-upload-{{ comment.id }}" accept="image/*" style="display:none;">
+            <label for="edit-media-upload-{{ comment.id }}" class="pd-upload xs">📎 Resim</label>
+            <div id="edit-media-preview-{{ comment.id }}">
+              {% if comment.media_data %}<div class="fi"><span class="fn">Mevcut medya</span><button type="button" class="rf" onclick="removeExistingCommentMedia({{ comment.id }})">×</button></div>{% endif %}
+            </div>
+          </div>
+          <input type="hidden" name="remove_media" id="remove-media-{{ comment.id }}" value="false">
+          <div class="pd-form-row">
+            <button type="submit" name="edit_comment" class="pdb primary xs">Kaydet</button>
+            <button type="button" class="pdb secondary xs" onclick="hideEditForm({{ comment.id }})">İptal</button>
+          </div>
+        </form>
+        {% endif %}
+      </div>
+      {% empty %}
+        <p class="pd-empty">Henüz yorum yok.</p>
+      {% endfor %}
+    </div>
+
+    <!-- new comment -->
+    <form method="post" class="pd-new-comment" enctype="multipart/form-data" onsubmit="return validateForm()">
+      {% csrf_token %}
+      <textarea name="comment_content" id="comment_content" class="pd-ta"
+                placeholder="Yorum yaz..."></textarea>
+      <div class="pd-nc-footer">
+        <input type="file" name="media" id="media-upload" accept="image/*" style="display:none;">
+        <label for="media-upload" class="pd-upload">📎</label>
+        <div id="media-preview"></div>
+        <button type="submit" name="comment" class="pdb primary">Gönder</button>
+      </div>
+    </form>
+
+  </aside>
 
 </div>
 
 <style>
-
-    .reactions-bar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        padding: 12px 0;
-    }
-
-    .reaction-section {
-        display: inline-block;
-        position: relative;
-    }
-
-    .reaction-btn {
-        background-color: #1e1e1e;
-        color: white;
-        border: 1px solid #333;
-        padding: 8px 14px;
-        border-radius: 20px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.9em;
-    }
-
-    .reaction-btn:hover {
-        background-color: #2a2a2a;
-        border-color: #cc1111;
-        transform: translateY(-2px);
-    }
-
-    .reaction-btn.active {
-        background-color: rgba(204,17,17,0.15);
-        border-color: #cc1111;
-    }
-
-    .reaction-emoji { font-size: 17px; }
-    .reaction-count { font-size: 13px; color: #bbb; font-weight: 600; }
-
-    .tooltip {
-        display: none;
-        position: absolute;
-        background-color: #333;
-        color: white;
-        padding: 10px;
-        border-radius: 5px;
-        min-width: 150px;
-        z-index: 1000;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        margin-top: 5px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-
-    .tooltip::before {
-        content: '';
-        position: absolute;
-        top: -5px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-width: 0 5px 5px 5px;
-        border-style: solid;
-        border-color: transparent transparent #333 transparent;
-    }
-
-    .tooltip-users {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        margin-top: 5px;
-    }
-
-    .tooltip-user {
-        font-size: 12px;
-        padding: 2px 5px;
-        background-color: #444;
-        border-radius: 3px;
-    }
-
-    .haha-section:hover .tooltip,
-    .dislike-section:hover .tooltip,
-    .angry-section:hover .tooltip,
-    .poop-section:hover .tooltip,
-    .nauseated-section:hover .tooltip {
-        display: block;
-    }
-
-
-    /* Yorumlar Kısmı */
-    .comment {
-        background-color: #232323;
-        border: 1px solid #af9595;
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 5px;
-    }
-
-    .comment-header {
-        font-weight: 600;
-        color: #cc3333;
-    }
-
-    .comment-body {
-        font-size: 14px;
-        margin-top: 5px;
-        color: #dddddd;
-    }
-
-    .comment-body a {
-        color: #008bff;
-        text-decoration: none;
-    }
-    .comment-body a:hover {
-        text-decoration: underline;
-    }
-
-    /* Yorum Formu */
-    .comment-form {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 20px;
-    }
-
-    .custom-textarea {
-        padding: 10px;
-        font-size: 14px;
-        resize: vertical;
-        border-radius: 5px;
-        border: 1px solid #af9595;
-        min-height: 100px;
-        background-color: #232323;
-        color: #fff;
-    }
-
-    .custom-textarea:focus {
-        outline: none;
-        border-color: #ff0000;
-    }
-
-    .submit-comment-btn {
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #ff00008f;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        align-self: flex-end;
-    }
-
-    .submit-comment-btn:hover {
-        background-color: #ff000075;
-    }
-
-    .comment-actions {
-        margin-top: 10px;
-        display: flex;
-        gap: 10px;
-    }
-
-    .edit-comment-btn, .delete-comment-btn {
-        padding: 5px 10px;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-        font-size: 12px;
-    }
-
-    .edit-comment-btn {
-        background-color: #4CAF50;
-        color: white;
-    }
-
-    .delete-comment-btn {
-        background-color: #f44336;
-        color: white;
-    }
-
-    .cancel-btn {
-        background-color: #808080;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    .edit-form {
-        margin-top: 10px;
-    }
-
-    /* Genel */
-    .post-details-topic {
-        background-color: #121212;
-        padding: 2em;
-        border-radius: 8px;
-        margin: 2em auto;
-        width: 80%;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .post-details-topic-header h2 {
-        font-size: 2em;
-        margin-bottom: 0.5em;
-        color: #fff;
-    }  
-
-    .post-details-post-header p {
-        margin: 0;
-    }
-
-    .post-details-post-header {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 1em;
-        font-size: 0.9em;
-        color: #696969;
-    }
-
-    .post-details-post-header strong {
-        color: #e0e0e0;
-    }
-
-    .post-details-content {
-        font-size: 1.2em;
-        line-height: 1.6;
-        margin-bottom: 1em;
-    }
-
- 
- 
-
-    /* delete button */
-
-    .delete-post-btn {
-        padding: 5px 10px;
-        font-size: 14px;
-        background-color: #f44336;
-        color: white;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-    }
-    
-    .delete-post-btn:hover {
-        background-color: #d32f2f;
-    }
-    
-    /* Media Upload */
-    .media-upload {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    }
-
-    .media-upload-btn {
-    padding: 8px 15px;
-    background-color: #444;
-    color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: background-color 0.3s, transform 0.3s;
-    }
-
-    .media-upload-btn:hover {
-    background-color: #555;
-    transform: scale(1.05);
-    }
-
-    .file-info {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background-color: #333;
-        padding: 6px 12px;
-        border-radius: 4px;
-        margin-left: 10px;
-    }
-    
-    .file-name {
-        color: #fff;
-        font-size: 14px;
-        max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    
-    .remove-file {
-        background: none;
-        border: none;
-        color: #ff4444;
-        font-size: 18px;
-        cursor: pointer;
-        padding: 0 4px;
-    }
-    
-    .remove-file:hover {
-        color: #ff0000;
-    }
-
-    /* Kullanicilarin post paylasirken girdigi medya */
-
-    .post-media {
-        margin-top: 20px;
-        text-align: left;
-    }
-    
-    .post-media-image {
-        max-width: 500px;
-        max-height: 500px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Edit post */
-
-    .post-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 10px;
-    }
-    
-    .edit-post-btn {
-        padding: 5px 10px;
-        font-size: 14px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-    }
-    
-    .edit-post-btn:hover {
-        background-color: #45a049;
-    }
-    
-    .submit-post-btn {
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        margin-right: 10px;
-    }
-    
-    .submit-post-btn:hover {
-        background-color: #45a049;
-    }
-    
-    .post-author-section .edit-form {
-        margin-top: 15px;
-        background-color: #232323;
-        padding: 15px;
-        border-radius: 5px;
-        border: 1px solid #af9595;
-    }
-    
-    .delete-post-form {
-        display: inline;
-    }
-
-    
-    /* CKEditor */
-    .ck.ck-editor {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin-bottom: 20px;
-    }
-
-    .ck.ck-editor__main > .ck-editor__editable {
-        min-height: 300px !important;
-        max-height: 800px !important;
-        padding: 1.5em !important;
-        font-size: 15px !important;
-        background: rgb(41,41,41);
-    }
-
-    .ck.ck-toolbar {
-        padding: 10px !important; 
-        font-size: 15px !important; 
-        background:rgb(193, 193, 193);
-    }
-
-    .ck.ck-toolbar .ck-button {
-        padding: 8px 12px !important; 
-        margin: 2px !important; 
-        background:rgb(166, 166, 166);
-    }
-
-    .edit-form {
-        margin: 20px 0;
-        padding: 20px;
-        width: 100%;
-        margin: 0 auto; 
-        weight: 100%;
-    }
-    
-    .form-buttons {
-        margin-top: 15px;
-        display: flex;
-        gap: 10px;
-    }
-    
-    .ck-content {
-        min-height: 300px;
-        background: #fff;
-        min-weight: 500px;
-        color: white;
-    }
-
-    .edit-media-preview img {
-        max-width: 200px;
-        max-height: 200px;
-        margin-top: 10px;
-    }
-    
-    #edit-media-preview .file-info {
-        margin-top: 10px;
-    }
-
-
-    .edit-comment-form {
-    background-color: #232323;
-    padding: 20px;
-    border-radius: 5px;
-    border: 1px solid #af9595;
-    margin-top: 15px;
-    }
-
-    .edit-comment-textarea-container {
-        margin-bottom: 15px;
-    }
-
-    .edit-comment-textarea {
-        width: 100%;
-        min-height: 100px;
-        background-color: #333;
-        color: #fff;
-        border: 1px solid #555;
-        padding: 10px;
-        border-radius: 4px;
-        resize: vertical;
-    }
-
-    .edit-comment-media-upload {
-        margin: 15px 0;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .edit-comment-media-btn {
-        padding: 8px 15px;
-        background-color: #444;
-        color: #fff;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: background-color 0.3s;
-    }
-
-    .edit-comment-media-btn:hover {
-        background-color: #555;
-    }
-
-    .edit-comment-file-info {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background-color: #333;
-        padding: 6px 12px;
-        border-radius: 4px;
-    }
-
-    .edit-comment-file-name {
-        color: #fff;
-        font-size: 14px;
-        max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .edit-comment-remove-file {
-        background: none;
-        border: none;
-        color: #ff4444;
-        font-size: 18px;
-        cursor: pointer;
-        padding: 0 4px;
-    }
-
-    .edit-comment-remove-file:hover {
-        color: #ff0000;
-    }
-
-    .edit-comment-buttons {
-        display: flex;
-        gap: 10px;
-        margin-top: 15px;
-    }
-
-    .edit-comment-save-btn {
-        background-color: #4CAF50;
-        padding: 8px 15px;
-        border: none;
-        border-radius: 4px;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    .edit-comment-cancel-btn {
-        background-color: #666;
-        padding: 8px 15px;
-        border: none;
-        border-radius: 4px;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    .edit-comment-save-btn:hover {
-        background-color: #45a049;
-    }
-
-    .edit-comment-cancel-btn:hover {
-        background-color: #777;
-    }
+/* ── Layout ── */
+.pd-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 12px;
+  max-width: 1080px;
+  width: 95%;
+  margin: 18px auto 50px;
+  align-items: start;
+  animation: pdIn 0.3s ease-out;
+}
+
+/* ── Post card ── */
+.pd-post {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 20px 22px;
+  min-width: 0;
+}
+
+/* ── Top bar ── */
+.pd-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.pd-cat-tag {
+  background: #1e0a0a;
+  color: #cc3333;
+  border: 1px solid #3a1010;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 0.76em;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  transition: background 0.15s;
+}
+.pd-cat-tag:hover { background: #2a1010; }
+.pd-date { color: #3a3a3a; font-size: 0.74em; }
+
+/* ── Author row ── */
+.pd-author-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.pd-author-info { display: flex; align-items: center; gap: 8px; }
+.pd-author-dot {
+  width: 8px; height: 8px;
+  background: #cc1111;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pd-author {
+  color: #e8e8e8;
+  font-weight: 700;
+  font-size: 1em;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.pd-author:hover { color: #cc3333; }
+
+/* ── Divider ── */
+.pd-divider { height: 1px; background: #1e1e1e; margin: 14px 0; }
+
+/* ── Post content ── */
+.post-details-content {
+  font-size: 0.95em; line-height: 1.8; color: #d4d4d4; word-break: break-word;
+}
+.post-details-content img { max-width: 100%; border-radius: 7px; margin: 6px 0; }
+.post-details-content a { color: #7ab0d4; }
+.post-details-content a:hover { text-decoration: underline; }
+.pd-media { margin-top: 14px; }
+.pd-media-img { max-width: 100%; max-height: 500px; border-radius: 9px; border: 1px solid #222; }
+
+/* ── Reactions ── */
+.pd-reactions { display: flex; flex-wrap: wrap; gap: 7px; }
+.rx { position: relative; }
+.rx form { margin: 0; }
+
+.rx-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #1a1a1a;
+  border: 1px solid #2c2c2c;
+  border-radius: 20px;
+  padding: 6px 13px;
+  cursor: pointer;
+  color: #aaa;
+  font-size: 0.86em;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.rx-pill:hover {
+  background: #222;
+  border-color: #cc1111;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(204,17,17,0.2);
+}
+.rx-pill.on {
+  background: #1e0808;
+  border-color: #cc1111;
+  color: #ff5555;
+  box-shadow: 0 2px 8px rgba(204,17,17,0.25);
+}
+.rx-n { font-size: 0.9em; min-width: 10px; }
+
+.rx-tip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  padding: 8px 12px;
+  min-width: 100px;
+  z-index: 200;
+  font-size: 0.77em;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.rx-tip b { display: block; color: #cc3333; margin-bottom: 4px; font-size: 0.9em; }
+.rx-tip i { display: block; color: #888; font-style: normal; padding: 1px 0; }
+.rx:hover .rx-tip { display: block; }
+
+/* ── Comments sidebar ── */
+.pd-sidebar {
+  background: #0f0f0f;
+  border: 1px solid #1e1e1e;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 70px;
+  max-height: calc(100vh - 100px);
+  overflow: hidden;
+}
+
+.pd-sidebar-head {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid #1e1e1e;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.pd-sidebar-title { color: #e0e0e0; font-weight: 700; font-size: 0.92em; }
+.pd-sidebar-badge {
+  background: #1e0808;
+  color: #cc3333;
+  border: 1px solid #3a1010;
+  border-radius: 8px;
+  padding: 1px 7px;
+  font-size: 0.72em;
+  font-weight: 700;
+}
+
+.pd-comments-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a2a transparent;
+}
+.pd-comments-scroll::-webkit-scrollbar { width: 4px; }
+.pd-comments-scroll::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+
+/* ── Comment item ── */
+.pd-comment {
+  padding: 10px 16px;
+  border-bottom: 1px solid #161616;
+  transition: background 0.1s;
+}
+.pd-comment:hover { background: #131313; }
+.pd-comment:last-child { border-bottom: none; }
+
+.pd-cm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.pd-cm-author { color: #cc3333; font-weight: 700; font-size: 0.8em; }
+.pd-cm-date { color: #2e2e2e; font-size: 0.7em; white-space: nowrap; }
+
+.pd-cm-body { color: #b8b8b8; font-size: 0.84em; line-height: 1.55; word-break: break-word; }
+.pd-cm-body a { color: #7ab0d4; }
+.pd-cm-img { max-width: 100%; border-radius: 6px; margin-top: 7px; border: 1px solid #222; }
+
+.pd-cm-actions { display: flex; gap: 5px; margin-top: 7px; }
+
+.pd-empty { color: #2a2a2a; font-style: italic; font-size: 0.83em; text-align: center; padding: 24px 16px; }
+
+/* ── New comment ── */
+.pd-new-comment {
+  flex-shrink: 0;
+  padding: 10px 12px;
+  border-top: 1px solid #1e1e1e;
+  background: #0f0f0f;
+}
+.pd-nc-footer {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 6px;
+}
+
+/* ── Textareas ── */
+.pd-ta {
+  width: 100%;
+  background: #161616;
+  color: #e0e0e0;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  padding: 9px 11px;
+  font-size: 0.86em;
+  resize: vertical;
+  min-height: 72px;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.pd-ta.sm { min-height: 58px; font-size: 0.82em; }
+.pd-ta:focus { outline: none; border-color: #cc1111; }
+.pd-ta::placeholder { color: #2e2e2e; }
+
+/* ── Buttons (pdb = post-detail-button) ── */
+.pdb {
+  padding: 6px 14px;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8em;
+  font-weight: 700;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.pdb.xs { padding: 3px 9px; font-size: 0.72em; border-radius: 5px; }
+
+.pdb.primary { background: #cc1111; color: #fff; }
+.pdb.primary:hover { background: #e01414; box-shadow: 0 2px 8px rgba(204,17,17,0.35); }
+
+.pdb.secondary { background: #1e1e1e; color: #888; border: 1px solid #2a2a2a; }
+.pdb.secondary:hover { background: #252525; color: #ccc; }
+
+.pdb.edit { background: #0d1f0d; color: #5aac5a; border: 1px solid #1a3a1a; }
+.pdb.edit:hover { background: #112611; }
+
+.pdb.danger { background: #1f0909; color: #d94f4f; border: 1px solid #3a1212; }
+.pdb.danger:hover { background: #2a0c0c; }
+
+/* ── Edit form ── */
+.pd-edit-form {
+  background: #141414;
+  border: 1px solid #222;
+  border-radius: 9px;
+  padding: 12px;
+  margin: 8px 0 2px;
+}
+.pd-owner-btns { display: flex; gap: 6px; }
+.pd-form-row { display: flex; gap: 7px; margin-top: 9px; }
+
+/* ── Upload ── */
+.pd-upload-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.pd-upload {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px; background: #1a1a1a;
+  border: 1px dashed #2c2c2c; border-radius: 6px;
+  color: #555; font-size: 0.78em; cursor: pointer; transition: all 0.15s;
+}
+.pd-upload.xs { padding: 3px 8px; font-size: 0.72em; }
+.pd-upload:hover { border-color: #cc1111; color: #bbb; background: #1e1010; }
+.fi { display: flex; align-items: center; gap: 6px; background: #1a1a1a; border-radius: 5px; padding: 3px 8px; }
+.fn { color: #aaa; font-size: 0.76em; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rf { background: none; border: none; color: #cc3333; font-size: 1em; cursor: pointer; padding: 0; transition: color 0.15s; }
+.rf:hover { color: #ff5555; }
+
+/* ── CKEditor ── */
+.ck.ck-editor { width: 100% !important; max-width: 100% !important; margin-bottom: 10px; }
+.ck.ck-editor__main > .ck-editor__editable { min-height: 200px !important; background: #161616; color: #e0e0e0; }
+.ck.ck-toolbar { background: #1e1e1e !important; border-color: #2a2a2a !important; }
+.ck.ck-toolbar .ck-button { background: #252525 !important; color: #ccc !important; }
+
+@keyframes pdIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Mobile ── */
+@media (max-width: 720px) {
+  .pd-layout { grid-template-columns: 1fr; }
+  .pd-sidebar { position: static; max-height: none; }
+  .pd-comments-scroll { max-height: 420px; }
+  .pd-media-img { max-width: 100%; }
+}
 </style>
+
 {% endblock %}
